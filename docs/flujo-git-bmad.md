@@ -9,6 +9,7 @@ Este proyecto usa un flujo tipo GitFlow ligero, con `main` como rama de producci
 - Hacer cada cambio en una rama corta y acotada.
 - Usar BMad como contrato de trabajo, no como simple nota suelta.
 - Separar implementacion, revision y promocion a produccion.
+- Tener una validacion automatica minima en GitHub para cada PR.
 
 ## Mapa de ramas
 
@@ -112,7 +113,7 @@ Regla operativa:
 
 ## Proteccion de ramas en GitHub
 
-Configura esto en el repositorio remoto:
+Configura esto en el repositorio remoto. La referencia detallada esta en [docs/github-setup.md](/c:/Users/jorge/source/repos/lavaclean/docs/github-setup.md).
 
 ### `main`
 
@@ -141,6 +142,15 @@ Configura esto en el repositorio remoto:
 3. Solo se promueve a `main` cuando la integracion esta estable.
 4. `main` se etiqueta con version semantica o version interna del release.
 5. Si sale un hotfix, se corrige en `hotfix/*`, se mezcla a `main` y se replica a `develop`.
+
+## Validacion automatica
+
+El workflow de referencia es [.github/workflows/repo-sanity.yml](/c:/Users/jorge/source/repos/lavaclean/.github/workflows/repo-sanity.yml).
+
+- Se ejecuta en `pull_request` y `push` sobre `develop` y `main`.
+- Instala dependencias con Yarn.
+- Corre `yarn ci`.
+- Ese check se debe exigir en la proteccion de ramas.
 
 ## Checklist rapido
 
