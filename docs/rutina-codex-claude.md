@@ -24,6 +24,7 @@ Este proyecto usa BMad como contrato de trabajo y dos asistentes con roles disti
 - Si Claude pide cambios grandes, seguir en la misma rama o crear una rama derivada desde `develop`.
 - No trabajar directo en `main`.
 - `main` solo recibe cambios ya validados.
+- Cuando una decision quede estable, registrar un resumen en Mem0 para recuperarla en sesiones futuras.
 
 ## Uso sugerido de herramientas
 
@@ -36,4 +37,4 @@ Este proyecto usa BMad como contrato de trabajo y dos asistentes con roles disti
 - `feature/*`: trabajo normal.
 - `bugfix/*`: correccion no urgente.
 - `hotfix/*`: correccion urgente desde produccion.
-
+- `Mem0`: memoria persistente para hechos estables del proyecto.
