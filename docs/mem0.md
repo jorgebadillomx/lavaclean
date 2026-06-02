@@ -6,6 +6,7 @@ Mem0 queda inicializado como memoria persistente para decisiones estables del pr
 
 - Al arrancar una sesión con BMad.
 - Antes de escoger `bmad-quick-dev`, `bmad-dev-story` o `bmad-create-story`.
+- Antes de consultar Context7 para escribir o modificar codigo.
 - Antes de implementar algo que dependa de decisiones previas.
 - Cuando retomas una tarea después de una pausa o cambias de sesión.
 - Antes de registrar una nueva decisión estable para evitar duplicados.
@@ -31,6 +32,7 @@ Mem0 queda inicializado como memoria persistente para decisiones estables del pr
 - Flujo Git y reglas de ramas.
 - Resúmenes curados de los artefactos de planificación.
 - Convenciones de trabajo con Codex y Claude.
+- La politica de Context7 para cualquier trabajo de codigo.
 - Decisiones estables que vale la pena recuperar en sesiones futuras.
 - Reglas de uso de BMad cuando ya están cerradas y no dependen del documento completo.
 

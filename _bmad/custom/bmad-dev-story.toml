@@ -1,0 +1,11 @@
+# Team override for bmad-dev-story.
+# Applies to both .agents and .claude skill activations via project customization merge.
+
+[workflow]
+activation_steps_prepend = [
+  "Before any implementation or code modification, consult Context7 for current documentation on every library, framework, SDK, API, or CLI involved in the task.",
+]
+persistent_facts = [
+  "file:{project-root}/docs/rutina-codex-claude.md",
+  "file:{project-root}/docs/bmad-context7-policy.md",
+]

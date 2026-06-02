@@ -11,8 +11,9 @@ Cuando trabajes este repo con BMad, sigue siempre este orden:
 
 1. Leer Mem0 para recuperar decisiones estables y contexto de sesiones anteriores.
 2. Activar el flujo BMad que corresponda al trabajo.
-3. Ejecutar el trabajo con Codex o revisar con Claude segun el rol.
-4. Registrar en Mem0 solo las decisiones estables que deban sobrevivir a la sesion.
+3. Consultar Context7 antes de escribir o modificar codigo.
+4. Ejecutar el trabajo con Codex o revisar con Claude segun el rol.
+5. Registrar en Mem0 solo las decisiones estables que deban sobrevivir a la sesion.
 
 Regla operativa para `lavaclean`:
 
@@ -41,6 +42,7 @@ Regla operativa para `lavaclean`:
 - `main` solo recibe cambios ya validados.
 - Cuando una decision quede estable, registrar un resumen en Mem0 para recuperarla en sesiones futuras.
 - No guardar en Mem0 documentos completos, solo resúmenes estables y útiles.
+- Si el trabajo requiere codigo, consultar Context7 antes de implementar para obtener documentacion actualizada.
 
 ## Uso sugerido de herramientas
 
@@ -48,6 +50,7 @@ Regla operativa para `lavaclean`:
 - Claude: revisar el resultado, detectar edge cases y proponer mejoras.
 - BMad: definir alcance, story y criterios antes de tocar codigo.
 - Mem0: recuperar contexto estable antes de entrar a BMad.
+- Context7: documentacion actualizada antes de escribir codigo.
 
 ## Definicion practica
 
