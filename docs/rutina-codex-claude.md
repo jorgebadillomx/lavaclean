@@ -49,6 +49,7 @@ Regla operativa para `lavaclean`:
 - Codex CLI: escribir, ajustar y probar codigo.
 - Claude: revisar el resultado, detectar edge cases y proponer mejoras.
 - BMad: definir alcance, story y criterios antes de tocar codigo.
+- Skills de Claude: cualquier skill que exista en `.claude/skills` debe tener su mirror en `.agents/skills` para que Codex CLI la use nativamente.
 - Mem0: recuperar contexto estable antes de entrar a BMad.
 - Context7: documentacion actualizada antes de escribir codigo.
 

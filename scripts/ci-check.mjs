@@ -1,4 +1,4 @@
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const root = process.cwd();
@@ -33,6 +33,31 @@ if (packageJson.private !== true) {
   process.exit(1);
 }
 
+function listDirectoryNames(directory) {
+  return readdirSync(directory, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort((left, right) => left.localeCompare(right));
+}
+
+const claudeSkillsPath = join(root, '.claude/skills');
+const agentsSkillsPath = join(root, '.agents/skills');
+if (!existsSync(claudeSkillsPath) || !existsSync(agentsSkillsPath)) {
+  console.error('Both .claude/skills and .agents/skills must exist to verify skill parity.');
+  process.exit(1);
+}
+
+const claudeSkills = listDirectoryNames(claudeSkillsPath);
+const agentSkills = listDirectoryNames(agentsSkillsPath);
+const missingAgentSkills = claudeSkills.filter((skill) => !agentSkills.includes(skill));
+if (missingAgentSkills.length > 0) {
+  console.error('.agents/skills is missing mirrors for Claude skills:');
+  for (const skill of missingAgentSkills) {
+    console.error(`- ${skill}`);
+  }
+  process.exit(1);
+}
+
 function collectTestFiles(directory, results = []) {
   for (const entry of readdirSync(directory, { withFileTypes: true })) {
     const absolutePath = join(directory, entry.name);
@@ -62,4 +87,3 @@ if (testFiles.length === 0) {
 console.log('Repo sanity checks passed.');
 console.log(`Test files discovered: ${testFiles.length}`);
 console.log(`Sample: ${testFiles.slice(0, 3).join(', ')}`);
-
