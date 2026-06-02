@@ -16,6 +16,7 @@ Configura estas reglas en GitHub:
 - Require status checks to pass before merging.
 - Require conversation resolution before merging.
 - Dismiss stale pull request approvals when new commits are pushed.
+- Include administrators / enforce admin rules.
 - Block force pushes.
 - Block branch deletion.
 - Restrict who can push to matching branches.
@@ -28,6 +29,7 @@ Configura estas reglas en GitHub:
 - Require at least 1 approval.
 - Require status checks to pass before merging.
 - Dismiss stale pull request approvals when new commits are pushed.
+- Include administrators / enforce admin rules.
 - Block force pushes.
 - Block branch deletion.
 
@@ -42,5 +44,5 @@ El workflow que debes exigir en branch protection es `repo-sanity`.
 3. Activar la proteccion de `main`.
 4. Activar la proteccion de `develop`.
 5. Marcar `repo-sanity` como status check requerido.
-6. Si el equipo trabaja principalmente en integracion, cambiar la rama por defecto a `develop`.
-
+6. Activar `Include administrators` en `main` y `develop` para bloquear bypass por owner/admin.
+7. Si el equipo trabaja principalmente en integracion, cambiar la rama por defecto a `develop`.
