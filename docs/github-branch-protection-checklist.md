@@ -17,6 +17,7 @@ Aplica esto en el repositorio remoto para que `main` y `develop` queden protegid
 - [ ] Activar `Dismiss stale pull request approvals when new commits are pushed`.
 - [ ] Bloquear `force pushes`.
 - [ ] Bloquear `branch deletion`.
+- [ ] Activar `Include administrators` para impedir bypass del owner/admin.
 - [ ] Restringir quien puede pushar.
 - [ ] Marcar `repo-sanity` como status check requerido.
 
@@ -28,6 +29,7 @@ Aplica esto en el repositorio remoto para que `main` y `develop` queden protegid
 - [ ] Activar `Dismiss stale pull request approvals when new commits are pushed`.
 - [ ] Bloquear `force pushes`.
 - [ ] Bloquear `branch deletion`.
+- [ ] Activar `Include administrators` para impedir bypass del owner/admin.
 - [ ] Marcar `repo-sanity` como status check requerido.
 
 ## 4. Verificacion final
@@ -36,4 +38,4 @@ Aplica esto en el repositorio remoto para que `main` y `develop` queden protegid
 - [ ] Confirmar que el check `repo-sanity` corre en GitHub Actions.
 - [ ] Confirmar que no se puede mergear sin aprobacion.
 - [ ] Confirmar que no se puede pushar directo a `main`.
-
+- [ ] Confirmar que el owner/admin tampoco puede bypassar la proteccion.
