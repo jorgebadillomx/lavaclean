@@ -3,6 +3,7 @@ node_modules/
 _bmad-output/
 .env
 .env.*
+!.env.example
 _bmad/**/*.user.toml
 coverage/
 dist/
