@@ -13,6 +13,7 @@ Mem0 queda inicializado como memoria persistente para decisiones estables del pr
 
 - `yarn mem0:ping` -> verifica conexión.
 - `yarn mem0:seed` -> carga memoria base del proyecto.
+- `yarn mem0:seed:planning` -> carga un seed curado de PRD, arquitectura, épicas, UX y flujo Git.
 - `yarn mem0:search -- "tu consulta"` -> busca recuerdos guardados.
 - `yarn mem0:remember -- "nota nueva"` -> guarda una nueva decisión o nota estable.
 
@@ -20,6 +21,7 @@ Mem0 queda inicializado como memoria persistente para decisiones estables del pr
 
 - Contexto del proyecto.
 - Flujo Git y reglas de ramas.
+- Resúmenes curados de los artefactos de planificación.
 - Convenciones de trabajo con Codex y Claude.
 - Decisiones estables que vale la pena recuperar en sesiones futuras.
 
@@ -28,4 +30,3 @@ Mem0 queda inicializado como memoria persistente para decisiones estables del pr
 - Usar `userId = lavaclean-project` para todo el contexto del repo.
 - Registrar solo hechos estables o decisiones ya confirmadas.
 - No guardar secretos, tokens ni datos sensibles en el texto de memoria.
-

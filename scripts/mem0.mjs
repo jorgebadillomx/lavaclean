@@ -82,6 +82,34 @@ function describeAddResult(result) {
   return String(result);
 }
 
+async function addProjectMemory(client, userId, entry) {
+  const result = await client.add(
+    [
+      {
+        role: 'user',
+        content: entry.content,
+      },
+      {
+        role: 'assistant',
+        content: entry.confirmation || 'Registered.',
+      },
+    ],
+    {
+      userId,
+      metadata: {
+        category: 'project-context',
+        source: entry.source || 'bootstrap',
+        kind: entry.kind,
+        title: entry.label,
+        ...(entry.metadata || {}),
+      },
+      infer: true,
+    },
+  );
+
+  console.log(`${entry.label}: ${describeAddResult(result)}`);
+}
+
 async function ping() {
   const { client } = getClient();
   await client.ping();
@@ -95,53 +123,116 @@ async function seed() {
   const bootstrapEntries = [
     {
       label: 'project identity',
-      messages: [
-        {
-          role: 'user',
-          content:
-            'Persist this project fact: lavaclean is a point of sale app for lavanderia/tintoreria, built with BMad as the workflow contract.',
-        },
-        { role: 'assistant', content: 'Stored.' },
-      ],
-      metadata: { category: 'project-context', kind: 'identity' },
+      content:
+        'Persist this project fact: lavaclean is a point of sale app for lavanderia/tintoreria, built with BMad as the workflow contract.',
+      kind: 'identity',
     },
     {
       label: 'git flow',
-      messages: [
-        {
-          role: 'user',
-          content:
-            'Persist this decision: develop is the default working branch, main is production, and all work should go through PRs plus repo-sanity checks.',
-        },
-        { role: 'assistant', content: 'Stored.' },
-      ],
-      metadata: { category: 'project-context', kind: 'git-flow' },
+      content:
+        'Persist this decision: develop is the default working branch, main is production, and all work should go through PRs plus repo-sanity checks.',
+      kind: 'git-flow',
     },
     {
       label: 'agent routine',
-      messages: [
-        {
-          role: 'user',
-          content:
-            'Persist this working rule: Codex implements, Claude reviews, and stable decisions should be recorded back into Mem0 for future sessions.',
-        },
-        { role: 'assistant', content: 'Stored.' },
-      ],
-      metadata: { category: 'project-context', kind: 'agent-routine' },
+      content:
+        'Persist this working rule: Codex implements, Claude reviews, and stable decisions should be recorded back into Mem0 for future sessions.',
+      kind: 'agent-routine',
     },
   ];
 
   for (const entry of bootstrapEntries) {
-    const result = await client.add(entry.messages, {
-      userId,
-      metadata: {
-        ...entry.metadata,
-        source: 'bootstrap',
-      },
-      infer: true,
+    await addProjectMemory(client, userId, {
+      ...entry,
+      source: 'bootstrap',
     });
+  }
+}
 
-    console.log(`${entry.label}: ${describeAddResult(result)}`);
+async function seedPlanning() {
+  const { client, userId } = getClient();
+  await client.ping();
+
+  const planningEntries = [
+    {
+      label: 'product scope',
+      kind: 'scope',
+      content:
+        'Persist this stable planning fact: Lavaclean is a point-of-sale app for lavanderia/tintoreria operations, with operator and administrator flows separated by role.',
+    },
+    {
+      label: 'planning status',
+      kind: 'status',
+      content:
+        'Persist this stable planning fact: PRD, UX, architecture, and epics are complete, and the project is marked ready for implementation.',
+    },
+    {
+      label: 'fr and nfr count',
+      kind: 'requirements',
+      content:
+        'Persist this stable planning fact: the product scope contains 25 functional requirements and 8 non-functional requirements, all covered by the epics and aligned with UX and architecture.',
+    },
+    {
+      label: 'architecture stack',
+      kind: 'architecture-stack',
+      content:
+        'Persist this stable planning fact: the implementation stack is Expo, React Native, TypeScript, EAS Build, Expo SQLite, Drizzle ORM, Supabase, Zustand, TanStack Query, and React Navigation 7.',
+    },
+    {
+      label: 'offline-first data model',
+      kind: 'data',
+      content:
+        'Persist this stable planning fact: offline-first is non-negotiable, SQLite is the local source of truth, and outbox sync to Supabase uses last-write-wins with server timestamps.',
+    },
+    {
+      label: 'printing architecture',
+      kind: 'printing',
+      content:
+        'Persist this stable planning fact: printing is non-blocking, ESC/POS payloads are generated in pure code, persisted with the note, and sent to RawBT via Android intent.',
+    },
+    {
+      label: 'security and auth',
+      kind: 'security',
+      content:
+        'Persist this stable planning fact: administrator auth is based on a hashed local config with SHA-256 plus ADMIN_SALT, and sensitive values must stay out of plain text source files.',
+    },
+    {
+      label: 'git workflow',
+      kind: 'git-flow',
+      content:
+        'Persist this stable planning fact: develop is the integration branch, main is production, feature branches carry one objective, and repo-sanity is the required quality check.',
+    },
+    {
+      label: 'ux constraints',
+      kind: 'ux',
+      content:
+        'Persist this stable planning fact: the UX is light-mode only in v1, the POS critical flow targets five taps or fewer, touch targets are at least 48dp, and tablet layout switches at 600dp.',
+    },
+    {
+      label: 'epic roadmap',
+      kind: 'roadmap',
+      content:
+        'Persist this stable planning fact: the epic order is foundation first, then auth and branch selection, products, shift and cash, POS notes and payment, printing, branch management, and admin history.',
+    },
+    {
+      label: 'operational scale',
+      kind: 'scale',
+      content:
+        'Persist this stable planning fact: there are five branches in operation from the start, and the main resource risk on Supabase is bandwidth rather than storage.',
+    },
+    {
+      label: 'collaboration rule',
+      kind: 'process',
+      content:
+        'Persist this stable planning fact: Codex implements changes, Claude reviews them, and stable decisions can be recorded back into Mem0 for future sessions.',
+    },
+  ];
+
+  for (const entry of planningEntries) {
+    await addProjectMemory(client, userId, {
+      ...entry,
+      source: 'planning-seed',
+    });
   }
 }
 
@@ -199,6 +290,9 @@ async function main() {
       return;
     case 'seed':
       await seed();
+      return;
+    case 'seed-planning':
+      await seedPlanning();
       return;
     case 'search':
       await search();

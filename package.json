@@ -7,6 +7,7 @@
     "mem0": "node scripts/mem0.mjs",
     "mem0:ping": "node scripts/mem0.mjs ping",
     "mem0:seed": "node scripts/mem0.mjs seed",
+    "mem0:seed:planning": "node scripts/mem0.mjs seed-planning",
     "mem0:search": "node scripts/mem0.mjs search",
     "mem0:remember": "node scripts/mem0.mjs remember"
   },
