@@ -5,6 +5,21 @@ Este proyecto usa BMad como contrato de trabajo y dos asistentes con roles disti
 - Codex: implementacion.
 - Claude: revision, refactor, validacion de riesgos y segunda opinion.
 
+## Orden De Trabajo
+
+Cuando trabajes este repo con BMad, sigue siempre este orden:
+
+1. Leer Mem0 para recuperar decisiones estables y contexto de sesiones anteriores.
+2. Activar el flujo BMad que corresponda al trabajo.
+3. Ejecutar el trabajo con Codex o revisar con Claude segun el rol.
+4. Registrar en Mem0 solo las decisiones estables que deban sobrevivir a la sesion.
+
+Regla operativa para `lavaclean`:
+
+- al arrancar una sesion con BMad,
+- antes de escoger `bmad-quick-dev`, `bmad-dev-story` o `bmad-create-story`,
+- y antes de implementar algo que dependa de decisiones previas.
+
 ## Ciclo diario
 
 1. Elegir una sola story o cambio acotado de BMad.
@@ -25,12 +40,14 @@ Este proyecto usa BMad como contrato de trabajo y dos asistentes con roles disti
 - No trabajar directo en `main`.
 - `main` solo recibe cambios ya validados.
 - Cuando una decision quede estable, registrar un resumen en Mem0 para recuperarla en sesiones futuras.
+- No guardar en Mem0 documentos completos, solo resúmenes estables y útiles.
 
 ## Uso sugerido de herramientas
 
 - Codex CLI: escribir, ajustar y probar codigo.
 - Claude: revisar el resultado, detectar edge cases y proponer mejoras.
 - BMad: definir alcance, story y criterios antes de tocar codigo.
+- Mem0: recuperar contexto estable antes de entrar a BMad.
 
 ## Definicion practica
 
