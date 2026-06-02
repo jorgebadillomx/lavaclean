@@ -1,0 +1,17 @@
+node_modules/
+.bmad-output/
+_bmad-output/
+.env
+.env.*
+_bmad/**/*.user.toml
+coverage/
+dist/
+build/
+tmp/
+temp/
+*.log
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
