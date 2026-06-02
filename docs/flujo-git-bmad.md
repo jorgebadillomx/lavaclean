@@ -10,6 +10,7 @@ Este proyecto usa un flujo tipo GitFlow ligero, con `main` como rama de producci
 - Usar BMad como contrato de trabajo, no como simple nota suelta.
 - Separar implementacion, revision y promocion a produccion.
 - Tener una validacion automatica minima en GitHub para cada PR.
+- Tener un punto de entrada claro para arrancar cualquier trabajo nuevo desde `develop`.
 
 ## Mapa de ramas
 
@@ -114,6 +115,7 @@ Regla operativa:
 ## Proteccion de ramas en GitHub
 
 Configura esto en el repositorio remoto. La referencia detallada esta en [docs/github-setup.md](/c:/Users/jorge/source/repos/lavaclean/docs/github-setup.md).
+La version operativa en forma de checklist esta en [docs/github-branch-protection-checklist.md](/c:/Users/jorge/source/repos/lavaclean/docs/github-branch-protection-checklist.md).
 
 ### `main`
 
@@ -151,6 +153,10 @@ El workflow de referencia es [.github/workflows/repo-sanity.yml](/c:/Users/jorge
 - Instala dependencias con Yarn.
 - Corre `yarn ci`.
 - Ese check se debe exigir en la proteccion de ramas.
+
+## Arranque BMad
+
+El punto de partida operativo esta en [docs/bmad-start-from-develop.md](/c:/Users/jorge/source/repos/lavaclean/docs/bmad-start-from-develop.md).
 
 ## Checklist rapido
 
