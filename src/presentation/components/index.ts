@@ -1,1 +1,12 @@
-// Barrel vacío para Sprint 0.
+export { AppHeader } from './AppHeader';
+export { BottomSheet } from './BottomSheet';
+export { CancelledTag } from './CancelledTag';
+export { ConnectivityBadge } from './ConnectivityBadge';
+export { CounterButton } from './CounterButton';
+export { DrawerItem } from './DrawerItem';
+export { EMPTY_STATE_REGISTRY, type EmptyStateVariant } from './emptyStateRegistry';
+export { EmptyState } from './EmptyState';
+export { FAB } from './FAB';
+export { PrimaryButton } from './PrimaryButton';
+export { Tag } from './Tag';
+export { TabBar } from './TabBar';
