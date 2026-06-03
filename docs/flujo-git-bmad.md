@@ -114,8 +114,8 @@ Regla operativa:
 
 ## Proteccion de ramas en GitHub
 
-Configura esto en el repositorio remoto. La referencia detallada esta en [docs/github-setup.md](/c:/Users/jorge/source/repos/lavaclean/docs/github-setup.md).
-La version operativa en forma de checklist esta en [docs/github-branch-protection-checklist.md](/c:/Users/jorge/source/repos/lavaclean/docs/github-branch-protection-checklist.md).
+Configura esto en el repositorio remoto. La referencia detallada esta en [docs/github-setup.md](docs/github-setup.md).
+La version operativa en forma de checklist esta en [docs/github-branch-protection-checklist.md](docs/github-branch-protection-checklist.md).
 
 ### `main`
 
@@ -147,7 +147,7 @@ La version operativa en forma de checklist esta en [docs/github-branch-protectio
 
 ## Validacion automatica
 
-El workflow de referencia es [.github/workflows/repo-sanity.yml](/c:/Users/jorge/source/repos/lavaclean/.github/workflows/repo-sanity.yml).
+El workflow de referencia es [.github/workflows/repo-sanity.yml](.github/workflows/repo-sanity.yml).
 
 - Se ejecuta en `pull_request` y `push` sobre `develop` y `main`.
 - Instala dependencias con Yarn.
@@ -156,7 +156,7 @@ El workflow de referencia es [.github/workflows/repo-sanity.yml](/c:/Users/jorge
 
 ## Arranque BMad
 
-El punto de partida operativo esta en [docs/bmad-start-from-develop.md](/c:/Users/jorge/source/repos/lavaclean/docs/bmad-start-from-develop.md).
+El punto de partida operativo esta en [docs/bmad-start-from-develop.md](docs/bmad-start-from-develop.md).
 
 ## Checklist rapido
 
