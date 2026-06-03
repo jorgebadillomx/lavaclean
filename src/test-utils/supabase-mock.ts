@@ -1,3 +1,5 @@
+type PostgrestError = { message: string; code: string; details: string };
+
 type MockQueryBuilder = {
   select: jest.MockedFunction<() => MockQueryBuilder>;
   insert: jest.MockedFunction<(data: unknown) => MockQueryBuilder>;
@@ -7,10 +9,13 @@ type MockQueryBuilder = {
   gt: jest.MockedFunction<(column: string, value: unknown) => MockQueryBuilder>;
   single: jest.MockedFunction<() => MockQueryBuilder>;
   data: unknown[] | null;
-  error: null;
+  error: PostgrestError | null;
 };
 
-function createMockQueryBuilder(data: unknown[] = []): MockQueryBuilder {
+function createMockQueryBuilder(
+  data: unknown[] = [],
+  error: PostgrestError | null = null,
+): MockQueryBuilder {
   const builder: MockQueryBuilder = {
     select: jest.fn((): MockQueryBuilder => builder),
     insert: jest.fn((_data: unknown): MockQueryBuilder => builder),
@@ -20,13 +25,16 @@ function createMockQueryBuilder(data: unknown[] = []): MockQueryBuilder {
     gt: jest.fn((_column: string, _value: unknown): MockQueryBuilder => builder),
     single: jest.fn((): MockQueryBuilder => builder),
     data,
-    error: null,
+    error,
   };
   return builder;
 }
 
-export function createSupabaseMock(defaultData: unknown[] = []) {
-  const fromMock = jest.fn(() => createMockQueryBuilder(defaultData));
+export function createSupabaseMock(
+  defaultData: unknown[] = [],
+  defaultError: PostgrestError | null = null,
+) {
+  const fromMock = jest.fn(() => createMockQueryBuilder(defaultData, defaultError));
 
   return {
     from: fromMock,
