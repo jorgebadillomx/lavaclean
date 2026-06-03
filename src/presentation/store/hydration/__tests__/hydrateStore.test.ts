@@ -82,7 +82,6 @@ jest.mock('expo-sqlite', () => {
   };
 });
 
-import { eq } from 'drizzle-orm';
 import { createTestDb } from '../../../../test-utils/db-test-utils';
 import * as schema from '../../../../infrastructure/db/schema';
 import { hydrateStore } from '../hydrateStore';
