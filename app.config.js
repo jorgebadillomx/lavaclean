@@ -14,7 +14,8 @@ module.exports = {
       sentryDsn: process.env.SENTRY_DSN ?? '',
     },
     plugins: [
-      ['expo-build-properties', { android: { allowBackup: false } }],
+      ['expo-build-properties', { android: { allowBackup: false, minSdkVersion: 24 } }],
+      ['expo-splash-screen', { image: './assets/images/splash.png', resizeMode: 'contain', backgroundColor: '#ffffff' }],
       '@sentry/react-native/expo',
     ],
   },
