@@ -22,3 +22,14 @@ jest.mock('drizzle-orm/expo-sqlite', () => ({
 }));
 
 jest.mock('react-native-reanimated', () => require('react-native-reanimated/mock'));
+
+jest.mock('expo-file-system/legacy', () => ({
+  documentDirectory: '/test-documents/',
+  readAsStringAsync: jest.fn(),
+  getInfoAsync: jest.fn(),
+}));
+
+jest.mock('expo-crypto', () => ({
+  digestStringAsync: jest.fn(),
+  CryptoDigestAlgorithm: { SHA256: 'SHA-256' },
+}));
