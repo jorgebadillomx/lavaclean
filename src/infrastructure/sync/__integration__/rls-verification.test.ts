@@ -52,6 +52,8 @@ describe.skip('RLS Integration Verification', () => {
       const clientA = createClient(TEST_URL, TEST_ANON_KEY);
       await clientA.auth.setSession({ access_token: BRANCH_A_TOKEN, refresh_token: '' });
       const { data } = await clientA.from('shifts').select('*');
+      expect(data).not.toBeNull();
+      expect(data?.length).toBeGreaterThan(0);
       expect(data?.every((row: { branch_id: string }) => row.branch_id !== BRANCH_B_ID)).toBe(true);
     });
   });
