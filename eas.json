@@ -1,0 +1,21 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "staging": {
+      "channel": "staging",
+      "android": {
+        "buildType": "apk",
+        "distribution": "internal"
+      }
+    },
+    "production": {
+      "channel": "production",
+      "android": {
+        "gradleCommand": ":app:assembleRelease"
+      }
+    }
+  }
+}
