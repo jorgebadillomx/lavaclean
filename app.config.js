@@ -16,7 +16,11 @@ module.exports = {
     plugins: [
       ['expo-build-properties', { android: { allowBackup: false, minSdkVersion: 24 } }],
       ['expo-splash-screen', { image: './assets/images/splash.png', resizeMode: 'contain', backgroundColor: '#ffffff' }],
-      '@sentry/react-native/expo',
+      ['@sentry/react-native/expo', {
+        url: 'https://sentry.io/',
+        organization: 'jorgebadillomx',
+        project: 'android',
+      }],
     ],
   },
 };
