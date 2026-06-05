@@ -46,7 +46,22 @@ export function hydrateStore(dbInstance: AppDB = defaultDb): HydrationResult {
     const branchRow = dbInstance.select().from(schema._meta)
       .where(eq(schema._meta.key, 'active_branch_id'))
       .all()[0];
-    const activeBranch = branchRow?.value ?? null;
+    let activeBranch: string | null = branchRow?.value ?? null;
+
+    if (activeBranch) {
+      const branchExists = dbInstance.select().from(schema.branches)
+        .where(eq(schema.branches.id, activeBranch))
+        .all()[0];
+
+      if (!branchExists) {
+        try {
+          dbInstance.delete(schema._meta).where(eq(schema._meta.key, 'active_branch_id')).run();
+        } catch {
+          // Cleanup non-critical; proceed with activeBranch = null regardless
+        }
+        activeBranch = null;
+      }
+    }
 
     // 2. products: catálogo activo (G2: null activo = DB vacía, no default hardcodeado)
     const products = dbInstance.select().from(schema.products)

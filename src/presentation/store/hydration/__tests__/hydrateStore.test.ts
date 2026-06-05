@@ -25,6 +25,7 @@ function resetStore() {
     activeBranch: null,
     products: [],
     selectedBranch: null,
+    pendingOperatorName: null,
   });
 }
 
