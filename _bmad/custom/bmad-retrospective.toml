@@ -1,0 +1,13 @@
+# Team override for bmad-retrospective.
+# Applies to both .agents and .claude skill activations via project customization merge.
+
+[workflow]
+on_complete = """
+La retrospectiva ha concluido y la épica está cerrada. Ahora ejecuta el flujo de git para subir todos los artefactos pendientes:
+1. Corre `git status` para identificar archivos pendientes: documento de retrospectiva, sprint-status.yaml actualizado, archivos de historias modificados.
+2. Si hay archivos pendientes, agrégalos con `git add` usando rutas específicas (nunca .env ni secretos).
+3. Si hay cambios para commitear, crea un commit con el formato: "docs(epic-{epic_number}): retrospectiva y cierre de épica {epic_number}" donde {epic_number} es el número real de la épica cerrada. Firma con: Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+4. Empuja la rama al remoto: `git push -u origin HEAD`.
+5. Crea el PR a develop usando gh pr create con --base develop, título que incluya el número y nombre de la épica, y body que liste los artefactos incluidos (retrospectiva, sprint-status, historias). Termina el body con: "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+6. Muestra la URL del PR al usuario y confirma el cierre completo de la épica.
+"""

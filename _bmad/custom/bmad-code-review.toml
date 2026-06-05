@@ -1,0 +1,13 @@
+# Team override for bmad-code-review.
+# Applies to both .agents and .claude skill activations via project customization merge.
+
+[workflow]
+on_complete = """
+La historia fue revisada y marcada como 'done'. Ahora ejecuta el flujo de git completo:
+1. Corre `git status` para ver todos los archivos modificados y nuevos.
+2. Agrega los archivos del código fuente y el archivo de historia con `git add` usando rutas específicas (nunca .env ni archivos de secretos).
+3. Crea un commit con el formato: "feat(story-{story_key}): {story_title}" donde {story_key} es la clave real de la historia (ej. 2-3-admin-auth) y {story_title} es el título descriptivo. Firma el commit con: Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
+4. Empuja la rama al remoto: `git push -u origin HEAD`.
+5. Crea el PR a develop usando gh pr create con --base develop, título que incluya el story_key y story_title, y body en markdown que liste los archivos cambiados, criterios de aceptación cumplidos y el path al archivo de historia. Termina el body con: "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+6. Muestra la URL del PR al usuario y confirma que todo quedó integrado.
+"""
