@@ -111,4 +111,8 @@ export function runMigrations(db: SQLiteDatabase): void {
       );
     });
   }
+
+  db.runSync(
+    "INSERT OR IGNORE INTO _meta (key, value) VALUES ('storage_alert_threshold_mb', '400')",
+  );
 }

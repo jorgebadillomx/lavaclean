@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import * as Sentry from '@sentry/react-native';
+import { Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { fireRawBTTestIntent, RAWBT_SPIKE_TEST_TEXT } from '../../../infrastructure/printing/RawBTPrinterAdapter';
 import { Colors, Spacing, Typography } from '../../theme/tokens';
 
 export function LoginScreen() {
-  useEffect(() => {
-    // Smoke test temporal para validar la integración de Sentry en Sprint 0.
-    Sentry.captureException(new Error('smoke-test'));
-  }, []);
+  const handleRawBTSpikePress = async () => {
+    const result = await fireRawBTTestIntent(RAWBT_SPIKE_TEST_TEXT);
+    console.log('[RawBT Spike] Resultado:', result);
+  };
 
   return (
     <View style={styles.container}>
@@ -16,6 +15,18 @@ export function LoginScreen() {
         <Text style={styles.brand}>LavaClean</Text>
       </View>
       <Text style={styles.subtitle}>Sistema de Punto de Venta</Text>
+      {__DEV__ && Platform.OS === 'android' ? (
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel="Probar impresión RawBT"
+          onPress={() => {
+            void handleRawBTSpikePress();
+          }}
+          style={styles.rawbtSpikeButton}
+        >
+          <Text style={styles.rawbtSpikeButtonLabel}>[DEV] Spike RawBT</Text>
+        </TouchableOpacity>
+      ) : null}
     </View>
   );
 }
@@ -47,5 +58,19 @@ const styles = StyleSheet.create({
     color: Colors.inkSecondary,
     fontSize: Typography.sizeSm,
     marginTop: Spacing.sm,
+  },
+  rawbtSpikeButton: {
+    backgroundColor: '#FFD600',
+    borderRadius: 12,
+    marginTop: 32,
+    minWidth: 180,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  rawbtSpikeButtonLabel: {
+    color: '#000000',
+    fontSize: Typography.sizeSm,
+    fontWeight: Typography.weightBold,
+    textAlign: 'center',
   },
 });

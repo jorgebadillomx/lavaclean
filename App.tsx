@@ -1,13 +1,7 @@
-import Constants from 'expo-constants';
 import * as Sentry from '@sentry/react-native';
 import { RootNavigator } from './src/presentation/navigation/RootNavigator';
 
-type AppExtra = {
-  sentryDsn?: string;
-};
-
-const expoConfig = Constants.expoConfig as { extra?: AppExtra } | null;
-const sentryDsn = expoConfig?.extra?.sentryDsn?.trim() ?? process.env.SENTRY_DSN?.trim() ?? '';
+const sentryDsn = (process.env.EXPO_PUBLIC_SENTRY_DSN ?? '').trim();
 
 function stripAdminKeys(value: unknown, seen = new WeakSet()): unknown {
   if (Array.isArray(value)) {

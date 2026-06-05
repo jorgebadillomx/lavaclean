@@ -1,12 +1,19 @@
-import * as Sentry from '@sentry/react-native';
 import { render } from '@testing-library/react-native';
+import { Platform } from 'react-native';
 import { LoginScreen } from '../LoginScreen';
 
-jest.mock('@sentry/react-native', () => ({
-  captureException: jest.fn(),
-}));
-
 describe('LoginScreen', () => {
+  beforeAll(() => {
+    try {
+      Object.defineProperty(Platform, 'OS', {
+        configurable: true,
+        value: 'android',
+      });
+    } catch {
+      (Platform as any).OS = 'android';
+    }
+  });
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -18,8 +25,20 @@ describe('LoginScreen', () => {
     expect(getByText('Sistema de Punto de Venta')).toBeTruthy();
   });
 
-  it('fires Sentry smoke-test on mount', () => {
-    render(<LoginScreen />);
-    expect(Sentry.captureException).toHaveBeenCalledWith(new Error('smoke-test'));
+  it('renders the RawBT spike button in Android dev builds', () => {
+    const { getByLabelText } = render(<LoginScreen />);
+
+    expect(getByLabelText('Probar impresión RawBT')).toBeTruthy();
+  });
+
+  it('does not render the RawBT spike button in staging/production builds (__DEV__ = false)', () => {
+    const originalDev = (global as any).__DEV__;
+    (global as any).__DEV__ = false;
+    try {
+      const { queryByLabelText } = render(<LoginScreen />);
+      expect(queryByLabelText('Probar impresión RawBT')).toBeNull();
+    } finally {
+      (global as any).__DEV__ = originalDev;
+    }
   });
 });
