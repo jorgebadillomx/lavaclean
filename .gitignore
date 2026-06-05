@@ -14,6 +14,8 @@ temp/
 .expo/
 android/app/debug.keystore
 lavaclean.db
+lavaclean.db-shm
+lavaclean.db-wal
 playwright-report/
 test-results/
 *.log
