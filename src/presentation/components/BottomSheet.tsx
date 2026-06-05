@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AccessibilityInfo,
   Animated,
@@ -22,14 +22,14 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
   const [mounted, setMounted] = useState(visible);
   const [reduceMotion, setReduceMotion] = useState<boolean | null>(null);
-  const translateY = useRef(new Animated.Value(Dimensions.get('window').height)).current;
-  const overlayOpacity = useRef(new Animated.Value(0)).current;
+  const translateY = useMemo(() => new Animated.Value(Dimensions.get('window').height), []);
+  const overlayOpacity = useMemo(() => new Animated.Value(0), []);
   const visibleRef = useRef(visible);
 
   // Keep ref in sync so animation callbacks read the latest value
   useEffect(() => {
     visibleRef.current = visible;
-  });
+  }, [visible]);
 
   // Resolve reduce-motion preference once on mount
   useEffect(() => {
@@ -44,7 +44,15 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
 
   // Control mounting — only set mounted=true here; unmounting is driven by the animation callback
   useEffect(() => {
-    if (visible) setMounted(true);
+    if (visible) {
+      const frame = requestAnimationFrame(() => {
+        setMounted(true);
+      });
+
+      return () => cancelAnimationFrame(frame);
+    }
+
+    return undefined;
   }, [visible]);
 
   // Drive animations — only after the component is mounted AND reduce-motion preference is known
@@ -67,8 +75,10 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
       if (reduceMotion) {
         translateY.setValue(screenHeight);
         overlayOpacity.setValue(0);
-        setMounted(false);
-        return;
+        const frame = requestAnimationFrame(() => {
+          setMounted(false);
+        });
+        return () => cancelAnimationFrame(frame);
       }
       Animated.parallel([
         Animated.timing(translateY, { toValue: screenHeight, duration: 180, useNativeDriver: true }),

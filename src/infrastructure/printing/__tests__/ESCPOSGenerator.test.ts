@@ -37,23 +37,6 @@
 describe('Story 5.1 — ESCPOSGenerator @P0 @ADR-004', () => {
 
   // ─────────────────────────────────────────────────────────────────
-  // Helper para crear TicketData de prueba
-  // ─────────────────────────────────────────────────────────────────
-  const createTestTicketData = () => ({
-    // customerAlias: 'Lupita',
-    // items: [
-    //   { productNameSnapshot: 'Lavado Normal', unitPriceCents: 8000, quantity: 2 },
-    //   { productNameSnapshot: 'Planchado', unitPriceCents: 5000, quantity: 1 },
-    // ],
-    // totalCents: 21000, // $210.00
-    // paymentMethod: 'cash' as const,
-    // amountReceivedCents: 21000,
-    // changeCents: 0,
-    // branchFooterMessage: null,
-    // closedAt: new Date().toISOString(),
-  });
-
-  // ─────────────────────────────────────────────────────────────────
   // AC-ESCPOS-01: Payload contiene todos los campos obligatorios
   // ─────────────────────────────────────────────────────────────────
   it.skip('[P0] generatePayload() contiene: Mote, items, total, método de pago, cambio', () => {
