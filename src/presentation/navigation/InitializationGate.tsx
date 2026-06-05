@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
+import { rawDb } from '../../infrastructure/db/client';
+import { hydrateIfNeeded } from '../../infrastructure/sync/InitialHydration';
+import { supabase } from '../../infrastructure/sync/SupabaseClient';
 import { useAppStore } from '../store';
 import { hydrateStore } from '../store/hydration/hydrateStore';
 
@@ -14,7 +17,12 @@ export function InitializationGate({ children }: Props) {
 
   useEffect(() => {
     if (initStatus === 'UNINITIALIZED') {
-      hydrateStore();
+      (async () => {
+        await hydrateIfNeeded(rawDb, supabase).catch(() => {
+          // Silencioso: la UI degradada ya se encarga del caso sin datos.
+        });
+        hydrateStore();
+      })();
     }
   }, [initStatus]);
 
