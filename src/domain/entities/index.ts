@@ -1,1 +1,1 @@
-// Barrel vacío para Sprint 0.
+export type { Branch } from './Branch';
