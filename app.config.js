@@ -23,6 +23,7 @@ module.exports = {
       eas: {
         projectId: '80847ecf-5324-4947-95f0-da696f1fa8df',
       },
+      adminSalt: process.env.ADMIN_SALT,
     },
     plugins: [
       ['expo-build-properties', { android: { allowBackup: false, minSdkVersion: 24 } }],

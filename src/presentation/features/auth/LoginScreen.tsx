@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,25 +8,45 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Constants from 'expo-constants';
+import { AdminAuthService } from '../../../infrastructure/auth/AdminAuthService';
 import { fireRawBTTestIntent, RAWBT_SPIKE_TEST_TEXT } from '../../../infrastructure/printing/RawBTPrinterAdapter';
 import { PrimaryButton } from '../../components/PrimaryButton';
 import { useAppStore } from '../../store';
 import { Colors, Rounded, Spacing, Typography } from '../../theme/tokens';
 
+const adminAuthService = new AdminAuthService({
+  salt: (Constants.expoConfig?.extra?.adminSalt as string | undefined) ?? '',
+});
+
 export function LoginScreen() {
   const activeShift = useAppStore((s) => s.activeShift);
   const [name, setName] = useState('');
+  const submitting = useRef(false);
 
   const handleRawBTSpikePress = async () => {
     const result = await fireRawBTTestIntent(RAWBT_SPIKE_TEST_TEXT);
     console.log('[RawBT Spike] Resultado:', result);
   };
 
-  function handleEnter() {
+  async function handleEnter() {
     const trimmed = name.trim();
-    if (!trimmed) return;
-    // Story 2.3: agregar verificación admin aquí (async)
-    useAppStore.getState().setPendingOperatorName(trimmed);
+    if (!trimmed || submitting.current) return;
+    submitting.current = true;
+    try {
+      const isAdmin = await adminAuthService.verify(trimmed);
+      if (isAdmin) {
+        useAppStore.getState().setIsAdminMode(true);
+        return;
+      }
+      useAppStore.getState().setPendingOperatorName(trimmed);
+    } catch {
+      // verify() failed unexpectedly — fall through to operator flow without re-throwing
+      // trimmed intentionally not logged (AC-ADMIN-04)
+      useAppStore.getState().setPendingOperatorName(trimmed);
+    } finally {
+      submitting.current = false;
+    }
   }
 
   if (activeShift) {

@@ -7,6 +7,9 @@ jest.mock('../../features/auth', () => ({
 jest.mock('../InitializationGate', () => ({
   InitializationGate: ({ children }: { children: any }) => children,
 }));
+jest.mock('../AdminDrawer', () => ({
+  AdminDrawer: () => <MockText testID="admin-drawer">AdminDrawer</MockText>,
+}));
 
 import { render } from '@testing-library/react-native';
 import { Text as MockText } from 'react-native';
@@ -22,6 +25,7 @@ describe('RootNavigator', () => {
       activeShift: null,
       products: [],
       pendingOperatorName: null,
+      isAdminMode: false,
     } as never);
   });
 
@@ -45,5 +49,13 @@ describe('RootNavigator', () => {
     const { getByTestId } = render(<RootNavigator />);
 
     expect(getByTestId('shift-open-screen')).toBeTruthy();
+  });
+
+  it('muestra AdminDrawer cuando isAdminMode es true', () => {
+    useAppStore.setState({ activeBranch: 'branch-1', isAdminMode: true } as never);
+
+    const { getByTestId } = render(<RootNavigator />);
+
+    expect(getByTestId('admin-drawer')).toBeTruthy();
   });
 });
