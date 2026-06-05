@@ -1,6 +1,8 @@
+import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { CerrarTurnoScreen } from '../features/admin/screens/CerrarTurnoScreen';
-import { ProductosAdminScreen } from '../features/admin/screens/ProductosAdminScreen';
+import { ProductListScreen } from '../features/products';
+import { ConnectivityBadge } from '../components/ConnectivityBadge';
 
 type OperatorDrawerParamList = {
   CerrarTurno: undefined;
@@ -19,8 +21,8 @@ export function OperatorDrawer() {
       />
       <Drawer.Screen
         name="Productos"
-        component={ProductosAdminScreen}
-        options={{ title: 'Productos' }}
+        component={ProductListScreen}
+        options={{ title: 'Productos', headerRight: () => <ConnectivityBadge /> }}
       />
       {/* SIN opciones admin aquí — AC-ADMIN-03 */}
     </Drawer.Navigator>

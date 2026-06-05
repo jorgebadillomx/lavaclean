@@ -7,9 +7,10 @@ import { Colors, Elevation, Rounded, Spacing, Typography } from '../theme/tokens
 type FABProps = {
   onPress: () => void;
   accessibilityLabel: string;
+  prominent?: boolean;
 };
 
-export function FAB({ onPress, accessibilityLabel }: FABProps) {
+export function FAB({ onPress, accessibilityLabel, prominent = false }: FABProps) {
   const insets = useSafeAreaInsets();
 
   return (
@@ -17,9 +18,13 @@ export function FAB({ onPress, accessibilityLabel }: FABProps) {
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
       onPress={onPress}
-      style={[styles.button, { bottom: Spacing.md + insets.bottom }]}
+      style={[
+        styles.button,
+        prominent && styles.buttonProminent,
+        { bottom: Spacing.md + insets.bottom },
+      ]}
     >
-      <Text style={styles.icon}>+</Text>
+      <Text style={[styles.icon, prominent && styles.iconProminent]}>+</Text>
     </Pressable>
   );
 }
@@ -40,11 +45,23 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     width: 56,
   },
+  buttonProminent: {
+    elevation: Elevation.fab * 2,
+    height: 72,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.45,
+    shadowRadius: 8,
+    width: 72,
+  },
   icon: {
     color: Colors.onAccentFab,
     fontFamily: Typography.fontFamily,
     fontSize: 28,
     fontWeight: Typography.weightBold,
     lineHeight: 28,
+  },
+  iconProminent: {
+    fontSize: 36,
+    lineHeight: 36,
   },
 });

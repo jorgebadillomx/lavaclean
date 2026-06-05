@@ -1,0 +1,117 @@
+import React, { useEffect, useMemo, useState } from 'react';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
+
+import type { Product } from '../../../../domain/entities/Product';
+import { ProductRepository } from '../../../../infrastructure/repositories/ProductRepository';
+import { useAppStore } from '../../../store';
+import { Colors, Spacing, Typography } from '../../../theme/tokens';
+import { EmptyState } from '../../../components/EmptyState';
+import { FAB } from '../../../components/FAB';
+import { formatCurrency } from '../../../utils/format';
+import { ProductSearchBar } from '../components/ProductSearchBar';
+
+export function ProductListScreen() {
+  const activeBranch = useAppStore((s) => s.activeBranch);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [query, setQuery] = useState('');
+
+  useEffect(() => {
+    let mounted = true;
+    new ProductRepository()
+      .findAllActive(activeBranch)
+      .then((data) => { if (mounted) setProducts(data); })
+      .catch(() => { if (mounted) setProducts([]); });
+    return () => { mounted = false; };
+  }, [activeBranch]);
+
+  const filtered = useMemo(() => {
+    if (!query.trim()) return products;
+    const q = query.toLowerCase();
+    return products.filter((p) => p.name.toLowerCase().includes(q));
+  }, [products, query]);
+
+  const isEmpty = filtered.length === 0 && query.trim() === '';
+
+  return (
+    <View style={styles.container}>
+      <ProductSearchBar value={query} onChangeText={setQuery} />
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <View style={styles.row}>
+            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+            <View style={styles.prices}>
+              <Text style={styles.price}>{formatCurrency(item.priceCents)}</Text>
+              {item.costCents != null ? (
+                <Text style={styles.cost}>Costo: {formatCurrency(item.costCents)}</Text>
+              ) : (
+                <Text style={styles.cost}>Costo: —</Text>
+              )}
+            </View>
+          </View>
+        )}
+        ListEmptyComponent={
+          query.trim() === ''
+            ? <EmptyState variant="PRODUCTS" />
+            : <Text style={styles.noResults}>Sin resultados para "{query}"</Text>
+        }
+        contentContainerStyle={filtered.length === 0 ? styles.emptyContainer : undefined}
+      />
+      <FAB
+        accessibilityLabel="Agregar producto"
+        onPress={() => {/* TODO Story 3.2 */}}
+        prominent={isEmpty}
+      />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.background,
+    flex: 1,
+  },
+  row: {
+    backgroundColor: Colors.surface,
+    borderBottomColor: Colors.border,
+    borderBottomWidth: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+  },
+  name: {
+    color: Colors.inkPrimary,
+    flex: 1,
+    fontFamily: Typography.fontFamily,
+    fontSize: Typography.sizeBase,
+    fontWeight: Typography.weightMedium,
+  },
+  prices: {
+    alignItems: 'flex-end',
+  },
+  price: {
+    color: Colors.inkPrimary,
+    fontFamily: Typography.fontFamily,
+    fontSize: Typography.sizeBase,
+    fontWeight: Typography.weightBold,
+  },
+  cost: {
+    color: Colors.inkSecondary,
+    fontFamily: Typography.fontFamily,
+    fontSize: Typography.sizeSm,
+    fontWeight: Typography.weightRegular,
+  },
+  noResults: {
+    color: Colors.inkSecondary,
+    fontFamily: Typography.fontFamily,
+    fontSize: Typography.sizeBase,
+    padding: Spacing.lg,
+    textAlign: 'center',
+  },
+  emptyContainer: {
+    flexGrow: 1,
+    justifyContent: 'center',
+  },
+});
