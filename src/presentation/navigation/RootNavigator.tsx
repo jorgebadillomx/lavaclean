@@ -2,14 +2,20 @@ import { NavigationContainer } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BranchSelectScreen, LoginScreen, ShiftOpenScreen } from '../features/auth';
 import { InitializationGate } from './InitializationGate';
+import { AdminDrawer } from './AdminDrawer';
 import { useAppStore } from '../store';
 
 function AuthRouter() {
   const activeBranch = useAppStore((state) => state.activeBranch);
+  const isAdminMode = useAppStore((state) => state.isAdminMode);
   const pendingOperatorName = useAppStore((state) => state.pendingOperatorName);
 
   if (!activeBranch) {
     return <BranchSelectScreen />;
+  }
+
+  if (isAdminMode) {
+    return <AdminDrawer />;
   }
 
   if (pendingOperatorName) {

@@ -8,11 +8,31 @@ jest.mock('../../../../infrastructure/printing/RawBTPrinterAdapter', () => ({
   RAWBT_SPIKE_TEST_TEXT: 'TEST',
 }));
 
+// mockVerify is assigned inside the factory body (runs before new AdminAuthService() in LoginScreen.tsx),
+// not in a closure that evaluates at constructor call time.  This avoids the TDZ hazard that arises when
+// a const/let initialiser runs after require('../LoginScreen') in Babel-transformed output.
+let mockVerify: jest.Mock;
+jest.mock('../../../../infrastructure/auth/AdminAuthService', () => {
+  mockVerify = jest.fn().mockResolvedValue(false);
+  return {
+    AdminAuthService: jest.fn().mockImplementation(() => ({
+      verify: mockVerify,
+    })),
+  };
+});
+
+jest.mock('expo-constants', () => ({
+  default: { expoConfig: { extra: { adminSalt: 'test-salt' } } },
+}));
+
 describe('LoginScreen', () => {
   beforeEach(() => {
+    mockVerify.mockReset();
+    mockVerify.mockResolvedValue(false);
     useAppStore.setState({
       activeShift: null,
       pendingOperatorName: null,
+      isAdminMode: false,
     } as never);
   });
 
@@ -80,5 +100,25 @@ describe('LoginScreen', () => {
         (Platform as any).OS = originalOS;
       }
     }
+  });
+
+  it('nombre de admin llama setIsAdminMode(true) y no navega a ShiftOpen', async () => {
+    mockVerify.mockResolvedValue(true);
+    const user = userEvent.setup();
+    render(<LoginScreen />);
+    await user.type(screen.getByLabelText('Campo de nombre'), 'AdminUser1');
+    await user.press(screen.getByLabelText('Entrar'));
+    expect(useAppStore.getState().isAdminMode).toBe(true);
+    expect(useAppStore.getState().pendingOperatorName).toBeNull();
+  });
+
+  it('nombre de operador no activa isAdminMode', async () => {
+    mockVerify.mockResolvedValue(false);
+    const user = userEvent.setup();
+    render(<LoginScreen />);
+    await user.type(screen.getByLabelText('Campo de nombre'), 'Juan');
+    await user.press(screen.getByLabelText('Entrar'));
+    expect(useAppStore.getState().isAdminMode).toBe(false);
+    expect(useAppStore.getState().pendingOperatorName).toBe('Juan');
   });
 });
