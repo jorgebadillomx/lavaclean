@@ -1,0 +1,113 @@
+# generated: 2026-06-02
+# last_updated: 2026-06-02
+# project: lavaclean
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-06-02
+last_updated: 2026-06-05  # 1-8 → done; 1-9 → in-progress; epic-1-retrospective → done; epic-2 → in-progress; 2-1 → done; 2-2 → done; 2-3 → done (code review: 4 patches aplicados); 2-4 → done (code review: 4 patches aplicados); epic-3 → in-progress; 3-1 → ready-for-dev; epic-2-retrospective → done
+project: lavaclean
+
+
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # ─── Epic 1: Fundación Técnica (Sprint 0) ───────────────────────────────────
+  epic-1: in-progress
+  1-1-scaffold-del-proyecto-y-pipeline-ci-cd: done
+  1-2-schema-sqlite-y-capa-de-base-de-datos-local: done
+  1-3-initializationgate-y-zustand-store: done
+  1-4-servicio-de-autenticacion-del-administrador: done
+  1-5-networkerrorclassifier-y-esqueleto-del-syncengine: done
+  1-6-configuracion-de-supabase-rls: done
+  1-7-sistema-de-diseno-tokens-y-componentes-atomicos: done
+  1-8-eas-build-sentry-y-apk-observable-en-dispositivo-fisico: done
+  1-9-spike-de-impresion-rawbt-y-monitoreo-de-storage-supabase: in-progress
+  epic-1-retrospective: done
+
+  # ─── Epic 2: Inicio de Sesión y Selección de Sucursal ───────────────────────
+  epic-2: in-progress
+  2-1-modal-de-seleccion-de-sucursal-en-primer-uso: done
+  2-2-login-de-operador-y-navegacion-al-turno: done
+  2-3-autenticacion-del-administrador-y-navegacion-admin: done
+  2-4-hidratacion-inicial-de-sucursales-y-productos-desde-supabase: done
+  epic-2-retrospective: done
+
+  # ─── Epic 3: Catálogo de Productos ──────────────────────────────────────────
+  epic-3: in-progress
+  3-1-listar-y-buscar-productos-del-catalogo: ready-for-dev
+  3-2-crear-y-editar-productos: backlog
+  3-3-desactivar-productos-solo-administrador: backlog
+  3-4-reordenamiento-manual-del-catalogo-por-sucursal: backlog
+  epic-3-retrospective: optional
+
+  # ─── Epic 4a: Turno y Caja ──────────────────────────────────────────────────
+  epic-4a: backlog
+  4a-1-apertura-de-turno-con-efectivo-inicial: backlog
+  4a-2-pos-con-estructura-de-pestanas-y-emptystate: backlog
+  4a-3-registrar-movimientos-de-caja: backlog
+  4a-4-cierre-de-turno-con-resumen-financiero: backlog
+  epic-4a-retrospective: optional
+
+  # ─── Epic 4b: POS Core — Notas y Cobro ─────────────────────────────────────
+  epic-4b: backlog
+  4b-1-crear-nota-con-mote-de-cliente: backlog
+  4b-2-agregar-y-quitar-productos-en-una-nota: backlog
+  4b-3-cobrar-una-nota-con-metodo-de-pago: backlog
+  4b-4-ver-notas-abiertas-y-cerradas-del-turno: backlog
+  4b-5-cancelar-nota-abierta-con-justificacion: backlog
+  epic-4b-retrospective: optional
+
+  # ─── Epic 5: Impresión de Tickets ───────────────────────────────────────────
+  epic-5: backlog
+  5-1-generador-escpos-formato-de-ticket-58mm: backlog
+  5-2-adaptador-rawbt-y-binding-de-iprintingservice: backlog
+  epic-5-retrospective: optional
+
+  # ─── Epic 6: Gestión de Sucursales (Admin) ──────────────────────────────────
+  epic-6: backlog
+  6-1-gestion-de-sucursales-listar-crear-y-editar: backlog
+  6-2-eliminar-sucursal: backlog
+  6-3-mensaje-de-pie-de-ticket-por-sucursal: backlog
+  6-4-cambio-de-sucursal-activa-por-el-administrador: backlog
+  epic-6-retrospective: optional
+
+  # ─── Epic 7: Historial de Turnos y Consulta Admin ───────────────────────────
+  epic-7: backlog
+  7-1-listar-turnos-cerrados-por-sucursal: backlog
+  7-2-ver-resumen-financiero-de-un-turno: backlog
+  7-3-ver-detalle-de-nota-historica: backlog
+  7-4-reimprimir-ticket-desde-historial: backlog
+  epic-7-retrospective: optional
