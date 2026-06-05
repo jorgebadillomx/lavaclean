@@ -11,6 +11,11 @@ dist/
 build/
 tmp/
 temp/
+.expo/
+android/app/debug.keystore
+lavaclean.db
+playwright-report/
+test-results/
 *.log
 *.tsbuildinfo
 __pycache__/
