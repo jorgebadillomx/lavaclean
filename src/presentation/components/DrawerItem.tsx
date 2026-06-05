@@ -1,7 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Colors, Rounded, Spacing, Typography } from '../theme/tokens';
+import { Colors, Spacing, Typography } from '../theme/tokens';
 
 type DrawerItemProps = {
   label: string;

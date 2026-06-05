@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { LoginScreen } from '../features/auth';
 import { InitializationGate } from './InitializationGate';
 
 export function RootNavigator() {
@@ -7,7 +8,7 @@ export function RootNavigator() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <NavigationContainer>
         <InitializationGate>
-          {null /* DrawerNavigator se agrega en Story 2.x */}
+          <LoginScreen />
         </InitializationGate>
       </NavigationContainer>
     </GestureHandlerRootView>

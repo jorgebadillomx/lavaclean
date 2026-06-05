@@ -2,8 +2,20 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
-    "types": ["jest", "node"]
+    "types": [
+      "jest",
+      "node"
+    ]
   },
-  "include": ["**/*.ts", "**/*.tsx", "expo-env.d.ts"],
-  "exclude": ["node_modules", "build", "coverage", "dist", "_bmad-output"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "build",
+    "coverage",
+    "dist",
+    "_bmad-output"
+  ]
 }

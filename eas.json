@@ -1,4 +1,7 @@
 {
+  "cli": {
+    "appVersionSource": "remote"
+  },
   "build": {
     "development": {
       "developmentClient": true,
@@ -7,12 +10,14 @@
     "staging": {
       "channel": "staging",
       "android": {
+        "withoutCredentials": true,
         "buildType": "apk",
         "distribution": "internal"
       }
     },
     "production": {
       "channel": "production",
+      "credentialsSource": "remote",
       "android": {
         "gradleCommand": ":app:assembleRelease"
       }
