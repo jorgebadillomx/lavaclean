@@ -1,7 +1,9 @@
+import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { HistorialTurnosScreen } from '../features/admin/screens/HistorialTurnosScreen';
-import { ProductosAdminScreen } from '../features/admin/screens/ProductosAdminScreen';
+import { ProductListScreen } from '../features/products';
 import { SucursalesAdminScreen } from '../features/admin/screens/SucursalesAdminScreen';
+import { ConnectivityBadge } from '../components/ConnectivityBadge';
 
 type AdminDrawerParamList = {
   HistorialTurnos: undefined;
@@ -21,8 +23,8 @@ export function AdminDrawer() {
       />
       <Drawer.Screen
         name="Productos"
-        component={ProductosAdminScreen}
-        options={{ title: 'Productos' }}
+        component={ProductListScreen}
+        options={{ title: 'Productos', headerRight: () => <ConnectivityBadge /> }}
       />
       <Drawer.Screen
         name="Sucursales"

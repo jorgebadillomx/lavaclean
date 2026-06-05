@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-02
-last_updated: 2026-06-05  # 1-8 → done; 1-9 → in-progress; epic-1-retrospective → done; epic-2 → in-progress; 2-1 → done; 2-2 → done; 2-3 → done (code review: 4 patches aplicados); 2-4 → done (code review: 4 patches aplicados); epic-3 → in-progress; 3-1 → ready-for-dev; epic-2-retrospective → done
+last_updated: 2026-06-05  # 1-8 → done; 1-9 → in-progress; epic-1-retrospective → done; epic-2 → in-progress; 2-1 → done; 2-2 → done; 2-3 → done (code review: 4 patches aplicados); 2-4 → done (code review: 4 patches aplicados); epic-3 → in-progress; 3-1 → done (code review: 5 patches aplicados); epic-2-retrospective → done
 project: lavaclean
 
 
@@ -67,7 +67,7 @@ development_status:
 
   # ─── Epic 3: Catálogo de Productos ──────────────────────────────────────────
   epic-3: in-progress
-  3-1-listar-y-buscar-productos-del-catalogo: ready-for-dev
+  3-1-listar-y-buscar-productos-del-catalogo: done
   3-2-crear-y-editar-productos: backlog
   3-3-desactivar-productos-solo-administrador: backlog
   3-4-reordenamiento-manual-del-catalogo-por-sucursal: backlog

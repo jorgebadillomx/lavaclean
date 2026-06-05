@@ -1,1 +1,1 @@
-// Barrel vacío para Sprint 0.
+export { ProductListScreen } from './screens/ProductListScreen';
