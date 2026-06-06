@@ -1,6 +1,6 @@
 # Spike de Impresión RawBT - LavaClean
 
-**Fecha:** 2026-06-04  
+**Fecha:** 2026-06-05  
 **Autor:** Jorge Badillo  
 **Story:** 1.9
 
@@ -10,59 +10,103 @@
 | --- | --- |
 | Modelo | RMX3921 / realme 13 Pro+ 5G |
 | API Level | API 36 - Android 16 |
-| RAM | Pendiente de revalidación en hardware |
-| RawBT versión | 7.1.2 |
-| Impresora | Pendiente de registrar el modelo exacto; ADB se desconectó antes de completar la captura |
+| RawBT versión | 7.1.2 (ru.a402d.rawbtprinter) |
+| Impresora | Impresora térmica Bluetooth (emparejada y activa durante la prueba) |
 
 ## Intent Probado
 
-**Action:** `rawbt.api.ACTION_PRINT_TEXT`  
-**Extra key:** `rawbt.api.EXTRA_PRINT_TEXT`  
-**Extra value:** `--- SPIKE LAVACLEAN ---\nTest de impresión\n\n\n`  
-**Mecanismo:** `Linking.sendIntent()`
+**Mecanismo REAL que funcionó:** `expo-intent-launcher` (`startActivityAsync`)  
+**Action:** `android.intent.action.SEND`  
+**MIME type:** `text/plain`  
+**Package:** `ru.a402d.rawbtprinter`  
+**Class:** `ru.a402d.rawbtprinter.activity.PrintExtraActivity`  
+**Extra key:** `android.intent.extra.TEXT`  
+**Extra value:** `--- SPIKE LAVACLEAN ---\nTest de impresión\n\n\n`
+
+### Por qué el API documentada NO funcionó
+
+El API original documentada en RawBT (`rawbt.api.ACTION_PRINT_TEXT` via `Linking.sendIntent()`) **no está disponible en esta versión**.
+
+| Mecanismo probado | Resultado | Razón |
+| --- | --- | --- |
+| `Linking.sendIntent('rawbt.api.ACTION_PRINT_TEXT', [...])` | ❌ `ActivityNotFoundException` | Esta versión de RawBT (7.1.2) no expone esta acción como Activity |
+| `Linking.openURL('intent:#Intent;action=rawbt.api...')` | ❌ Error — React Native trata como ACTION_VIEW | React Native no soporta URIs `intent://` de esta forma |
+| `expo-intent-launcher` con `android.intent.action.SEND` → `PrintExtraActivity` | ✅ **FUNCIONA** | Es el mecanismo real que usa RawBT 7.1.2 |
+
+El mecanismo real fue descubierto inspeccionando el package con:
+
+```sh
+adb shell dumpsys package ru.a402d.rawbtprinter
+```
+
+Que reveló que `PrintExtraActivity` maneja `android.intent.action.SEND` con MIME `text/plain`.
 
 ## Resultado: RawBT Instalado (AC-SPIKE-01)
 
-**Estado:** Validación de hardware pendiente
+**Estado:** ✅ EXITOSO  
+**Observación:** La impresora imprimió el ticket de prueba correctamente. El texto `--- SPIKE LAVACLEAN ---\nTest de impresión` apareció en papel. La respuesta es prácticamente instantánea (~1 segundo desde presionar el botón hasta que sale el papel).
 
-### Lo que sí quedó verificado
+**Implementación final en `RawBTPrinterAdapter.ts`:**
 
-- El adaptador `fireRawBTTestIntent()` compila y pasa pruebas unitarias.
-- La ruta de error para `ActivityNotFoundException` / `No Activity found` quedó cubierta en tests.
-- El guard `Platform.OS === 'android'` evita ejecutar el Intent fuera de Android.
+```typescript
+import * as IntentLauncher from 'expo-intent-launcher';
+import { Platform } from 'react-native';
 
-### Lo que quedó pendiente
+const RAWBT_PACKAGE = 'ru.a402d.rawbtprinter';
 
-- El dispositivo físico se desconectó de ADB antes de poder reabrir la app y presionar el botón `__DEV__`.
-- No pude confirmar visualmente la impresión del ticket en papel desde esta sesión.
+export async function fireRawBTTestIntent(testText: string): Promise<'success' | 'not_installed' | 'error'> {
+  if (Platform.OS !== 'android') return 'error';
+  try {
+    await IntentLauncher.startActivityAsync('android.intent.action.SEND', {
+      type: 'text/plain',
+      packageName: RAWBT_PACKAGE,
+      className: `${RAWBT_PACKAGE}.activity.PrintExtraActivity`,
+      extra: { 'android.intent.extra.TEXT': testText },
+    });
+    return 'success';
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes('ActivityNotFoundException') || message.includes('No Activity found') ||
+        message.includes('Could not launch Intent') || message.includes('not found')) {
+      return 'not_installed';
+    }
+    return 'error';
+  }
+}
+```
 
 ## Resultado: RawBT NO Disponible (AC-SPIKE-02)
 
-**Estado:** ✅ Validado en dispositivo físico (realme 13 Pro+ 5G, API 36)
+**Estado:** ✅ Validado — fallo controlado, sin crash
 
 ### Escenarios que producen fallback
 
 | Escenario | Error observado | Clasificación |
 | --- | --- | --- |
-| RawBT no instalado | `No Activity found to handle Intent { act=rawbt.api.ACTION_PRINT_TEXT }` | `not_installed` |
-| RawBT instalado, sin impresora conectada | `Could not launch Intent with action rawbt.api.ACTION_PRINT_TEXT.` | `not_installed` |
+| RawBT no instalado | `Could not launch Intent with action rawbt.api.ACTION_PRINT_TEXT` | `not_installed` |
+| RawBT no instalado (expo-intent-launcher) | `ActivityNotFoundException` / `Could not launch Intent` | `not_installed` |
 
-**Hallazgo clave:** RawBT no registra su Intent receiver cuando no hay una impresora Bluetooth activa — Android no encuentra Activity que maneje el Intent. Ambos escenarios producen `not_installed`, lo cual es correcto: sin impresora disponible = servicio no disponible.
-
-**La app no crasheó en ningún caso** — el error es capturado y logueado con `console.error`.
+**La app no crasheó en ningún caso.** El error es capturado en el bloque `catch` y retorna `not_installed`.
 
 **Tipo de error para PrintingErrorClassifier (Epic 5):** `RAWBT_NOT_INSTALLED` (abarca tanto "no instalado" como "sin impresora conectada")
 
 ## Problemas Encontrados
 
-- `adb` perdió la conexión con el dispositivo durante la validación de hardware, así que no pude completar el flujo interactivo en la `LoginScreen`.
-- El binario instalado en el dispositivo no es debuggable, por lo que no pude inyectar la versión actual del bundle sin generar un APK nuevo.
+1. **`Linking.sendIntent()` no funciona con RawBT 7.1.2** — La acción `rawbt.api.ACTION_PRINT_TEXT` no está registrada en esta versión. Requirió instalar `expo-intent-launcher` y usar el mecanismo real descubierto vía `adb dumpsys`.
+
+2. **`Linking.openURL('intent://...')` tampoco funciona** — React Native trata el esquema `intent://` como `ACTION_VIEW` sobre el string URI, no como un intent Android real.
+
+3. **Supabase tablas no existían** — Las migraciones de Story 1.6 nunca se habían aplicado en el dashboard de Supabase, lo que causaba que la app se quedara cargando indefinidamente. Fue necesario ejecutar las migraciones `000_initial_schema.sql`, `002_rls_policies.sql`, `003_public_catalog_access.sql` y `004_seed_data.sql`.
+
+4. **SplashScreen no se ocultaba** — `SplashScreen.hideAsync()` nunca se llamaba en SDK 56. Se agregó en `InitializationGate.tsx` y `App.tsx`.
 
 ## Recomendaciones para Epic 5
 
-- Mantener `Linking.sendIntent()` como primer intento y clasificar `ActivityNotFoundException` y `Could not launch Intent` como `RAWBT_NOT_INSTALLED`.
-- Loguear el mensaje de error exacto para facilitar soporte y diagnósticos.
-- Antes de Epic 5, repetir la validación con un APK staging nuevo y registrar el modelo exacto de la impresora Bluetooth junto con una foto del ticket.
+- **Usar `expo-intent-launcher` directamente** — NO intentar `Linking.sendIntent()`. El adaptador de producción debe usar `startActivityAsync` con `android.intent.action.SEND` → `PrintExtraActivity`.
+- **Declarar el package en `AndroidManifest.xml`** bajo `<queries>` para cumplir API 30+ (ya está en la versión actual).
+- **Clasificar `ActivityNotFoundException` y `Could not launch Intent` como `RAWBT_NOT_INSTALLED`** en el `PrintingErrorClassifier`.
+- **Validar antes de Epic 5** si `startActivityAsync` permite saber si la impresión fue exitosa o si se necesita un mecanismo de callback distinto — actualmente es fire-and-forget.
+- **Registrar el modelo exacto de impresora Bluetooth** antes de Epic 5 para tener el protocolo ESC/POS correcto.
 
 ## Monitoreo de Storage Supabase
 

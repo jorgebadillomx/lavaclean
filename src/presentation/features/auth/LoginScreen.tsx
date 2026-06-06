@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/react-native';
 import { useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -8,7 +9,6 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import Constants from 'expo-constants';
 import { AdminAuthService } from '../../../infrastructure/auth/AdminAuthService';
 import { fireRawBTTestIntent, RAWBT_SPIKE_TEST_TEXT } from '../../../infrastructure/printing/RawBTPrinterAdapter';
 import { PrimaryButton } from '../../components/PrimaryButton';
@@ -16,7 +16,7 @@ import { useAppStore } from '../../store';
 import { Colors, Rounded, Spacing, Typography } from '../../theme/tokens';
 
 const adminAuthService = new AdminAuthService({
-  salt: (Constants.expoConfig?.extra?.adminSalt as string | undefined) ?? '',
+  salt: process.env.EXPO_PUBLIC_ADMIN_SALT ?? '',
 });
 
 export function LoginScreen() {
@@ -27,6 +27,7 @@ export function LoginScreen() {
   const handleRawBTSpikePress = async () => {
     const result = await fireRawBTTestIntent(RAWBT_SPIKE_TEST_TEXT);
     console.log('[RawBT Spike] Resultado:', result);
+    Sentry.captureMessage(`[smoke-test] rawbt-spike result: ${result}`, 'info');
   };
 
   async function handleEnter() {
