@@ -1,5 +1,8 @@
 import * as Sentry from '@sentry/react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import { RootNavigator } from './src/presentation/navigation/RootNavigator';
+
+SplashScreen.hideAsync().catch(() => {});
 
 const sentryDsn = (process.env.EXPO_PUBLIC_SENTRY_DSN ?? '').trim();
 

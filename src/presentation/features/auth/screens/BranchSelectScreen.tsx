@@ -44,12 +44,20 @@ export function BranchSelectScreen({
     setMessage(null);
 
     // P5: treat null (Android unknown state) as potentially connected
-    const connection = await NetInfo.fetch().catch(() => ({ isConnected: false }));
+    const connection = await Promise.race([
+      NetInfo.fetch(),
+      new Promise<{ isConnected: boolean | null }>((resolve) =>
+        setTimeout(() => resolve({ isConnected: true }), 3000)
+      ),
+    ]).catch(() => ({ isConnected: false }));
 
     if (connection.isConnected !== false) {
       try {
         // P3: wrap entire remote path so save() failures fall through to cache
-        const response = await resolvedSupabaseClient.from('branches').select('*');
+        const response = await Promise.race([
+          resolvedSupabaseClient.from('branches').select('*'),
+          new Promise<never>((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000)),
+        ]);
         if (!response.error) {
           const remoteBranches = ((response.data ?? []) as {
             id: string;
