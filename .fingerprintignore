@@ -1,0 +1,5 @@
+# EAS Build modifies multiple files in android/ before recalculating the fingerprint
+# in CONFIGURE_EXPO_UPDATES (version code in build.gradle, channel in strings.xml,
+# and other modifications done by FIX_GRADLEW / INSTALL_DEPENDENCIES on Linux).
+# Native module changes are still captured via node_modules/*/android sources.
+android/
