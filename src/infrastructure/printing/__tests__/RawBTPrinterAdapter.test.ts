@@ -1,12 +1,8 @@
-import { Linking, Platform } from 'react-native';
-import {
-  fireRawBTTestIntent,
-  RAWBT_ACTION,
-  RAWBT_EXTRA_KEY,
-  RAWBT_SPIKE_TEST_TEXT,
-} from '../RawBTPrinterAdapter';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { Platform } from 'react-native';
+import { fireRawBTTestIntent, RAWBT_SPIKE_TEST_TEXT } from '../RawBTPrinterAdapter';
 
-const mockSendIntent = jest.fn();
+const mockStartActivityAsync = jest.spyOn(IntentLauncher, 'startActivityAsync');
 
 function setPlatformOS(os: string): void {
   try {
@@ -19,27 +15,12 @@ function setPlatformOS(os: string): void {
   }
 }
 
-function setSendIntentMock(): void {
-  try {
-    Object.defineProperty(Linking, 'sendIntent', {
-      configurable: true,
-      value: mockSendIntent,
-    });
-  } catch {
-    (Linking as any).sendIntent = mockSendIntent;
-  }
-}
-
 describe('fireRawBTTestIntent', () => {
   const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
 
-  beforeAll(() => {
-    setSendIntentMock();
-  });
-
   beforeEach(() => {
     setPlatformOS('android');
-    mockSendIntent.mockReset();
+    mockStartActivityAsync.mockReset();
     consoleErrorSpy.mockClear();
   });
 
@@ -48,17 +29,20 @@ describe('fireRawBTTestIntent', () => {
   });
 
   it('sends the RawBT print intent with the expected action and extra payload', async () => {
-    mockSendIntent.mockResolvedValueOnce(undefined);
+    mockStartActivityAsync.mockResolvedValueOnce(undefined as never);
 
     await expect(fireRawBTTestIntent(RAWBT_SPIKE_TEST_TEXT)).resolves.toBe('success');
 
-    expect(mockSendIntent).toHaveBeenCalledWith(RAWBT_ACTION, [
-      { key: RAWBT_EXTRA_KEY, value: RAWBT_SPIKE_TEST_TEXT },
-    ]);
+    expect(mockStartActivityAsync).toHaveBeenCalledWith('android.intent.action.SEND', {
+      type: 'text/plain',
+      packageName: 'ru.a402d.rawbtprinter',
+      className: 'ru.a402d.rawbtprinter.activity.PrintExtraActivity',
+      extra: { 'android.intent.extra.TEXT': RAWBT_SPIKE_TEST_TEXT },
+    });
   });
 
   it('classifies the missing RawBT app error as not_installed (No Activity found variant)', async () => {
-    mockSendIntent.mockRejectedValueOnce(
+    mockStartActivityAsync.mockRejectedValueOnce(
       new Error('No Activity found to handle Intent { act=rawbt.api.ACTION_PRINT_TEXT }'),
     );
 
@@ -70,7 +54,7 @@ describe('fireRawBTTestIntent', () => {
   });
 
   it('classifies the missing RawBT app error as not_installed (React Native / API 36 variant)', async () => {
-    mockSendIntent.mockRejectedValueOnce(
+    mockStartActivityAsync.mockRejectedValueOnce(
       new Error('Could not launch Intent with action rawbt.api.ACTION_PRINT_TEXT.'),
     );
 
@@ -82,7 +66,7 @@ describe('fireRawBTTestIntent', () => {
   });
 
   it('returns error for unexpected intent failures', async () => {
-    mockSendIntent.mockRejectedValueOnce(new Error('boom'));
+    mockStartActivityAsync.mockRejectedValueOnce(new Error('boom'));
 
     await expect(fireRawBTTestIntent('test')).resolves.toBe('error');
     expect(consoleErrorSpy).toHaveBeenCalledWith('[RawBT Spike] Intent failed:', 'boom');
@@ -92,6 +76,6 @@ describe('fireRawBTTestIntent', () => {
     setPlatformOS('ios');
 
     await expect(fireRawBTTestIntent('test')).resolves.toBe('error');
-    expect(mockSendIntent).not.toHaveBeenCalled();
+    expect(mockStartActivityAsync).not.toHaveBeenCalled();
   });
 });

@@ -114,4 +114,107 @@ describe('ProductRepository', () => {
       createdAt: '2026-06-01T10:00:00.000Z',
     });
   });
+
+  it('save() inserta un nuevo producto y findAllActive() lo retorna', async () => {
+    const repo = new ProductRepository(testDb as never);
+    const product = {
+      id: 'prod-new',
+      name: 'Nuevo Servicio',
+      priceCents: 5500,
+      costCents: null,
+      active: true,
+      version: 1,
+      createdAt: NOW,
+    };
+
+    await repo.save(product);
+    const all = await repo.findAllActive(null);
+
+    expect(all.find((item) => item.id === product.id)).toEqual(product);
+  });
+
+  it('findById() retorna el producto mapeado a camelCase', async () => {
+    testDb.insert(schema.products).values({
+      id: 'prod-find',
+      name: 'Servicio encontrado',
+      price_cents: 12300,
+      cost_cents: 4500,
+      active: 1,
+      version: 2,
+      created_at: NOW,
+    }).run();
+
+    const repo = new ProductRepository(testDb as never);
+    const result = await repo.findById('prod-find');
+
+    expect(result).toEqual({
+      id: 'prod-find',
+      name: 'Servicio encontrado',
+      priceCents: 12300,
+      costCents: 4500,
+      active: true,
+      version: 2,
+      createdAt: NOW,
+    });
+  });
+
+  it('findById() retorna null para un ID inexistente', async () => {
+    const repo = new ProductRepository(testDb as never);
+
+    await expect(repo.findById('missing-id')).resolves.toBeNull();
+  });
+
+  it('save() actualiza nombre, precio y versión sin cambiar created_at', async () => {
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.save({
+      id: 'prod-edit',
+      name: 'Versión inicial',
+      priceCents: 8000,
+      costCents: 3000,
+      active: true,
+      version: 1,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    });
+
+    await repo.save({
+      id: 'prod-edit',
+      name: 'Versión editada',
+      priceCents: 9100,
+      costCents: null,
+      active: true,
+      version: 2,
+      createdAt: '2026-12-31T23:59:59.000Z',
+    });
+
+    const product = await repo.findById('prod-edit');
+
+    expect(product).toEqual({
+      id: 'prod-edit',
+      name: 'Versión editada',
+      priceCents: 9100,
+      costCents: null,
+      active: true,
+      version: 2,
+      createdAt: '2026-01-01T00:00:00.000Z',
+    });
+  });
+
+  it('save() conserva costCents null', async () => {
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.save({
+      id: 'prod-null-cost',
+      name: 'Sin costo',
+      priceCents: 7000,
+      costCents: null,
+      active: true,
+      version: 1,
+      createdAt: NOW,
+    });
+
+    const product = await repo.findById('prod-null-cost');
+
+    expect(product?.costCents).toBeNull();
+  });
 });

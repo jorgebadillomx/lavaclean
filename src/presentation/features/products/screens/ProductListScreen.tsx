@@ -1,5 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import type { Product } from '../../../../domain/entities/Product';
 import { ProductRepository } from '../../../../infrastructure/repositories/ProductRepository';
@@ -9,20 +11,36 @@ import { EmptyState } from '../../../components/EmptyState';
 import { FAB } from '../../../components/FAB';
 import { formatCurrency } from '../../../utils/format';
 import { ProductSearchBar } from '../components/ProductSearchBar';
+import type { ProductsStackParamList } from '../ProductsNavigator';
 
 export function ProductListScreen() {
   const activeBranch = useAppStore((s) => s.activeBranch);
+  const navigation = useNavigation<NativeStackNavigationProp<ProductsStackParamList, 'ProductList'>>();
   const [products, setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    let mounted = true;
-    new ProductRepository()
-      .findAllActive(activeBranch)
-      .then((data) => { if (mounted) setProducts(data); })
-      .catch(() => { if (mounted) setProducts([]); });
-    return () => { mounted = false; };
-  }, [activeBranch]);
+  useFocusEffect(
+    useCallback(() => {
+      let mounted = true;
+
+      new ProductRepository()
+        .findAllActive(activeBranch)
+        .then((data) => {
+          if (mounted) {
+            setProducts(data);
+          }
+        })
+        .catch(() => {
+          if (mounted) {
+            setProducts([]);
+          }
+        });
+
+      return () => {
+        mounted = false;
+      };
+    }, [activeBranch]),
+  );
 
   const filtered = useMemo(() => {
     if (!query.trim()) return products;
@@ -39,8 +57,15 @@ export function ProductListScreen() {
         data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.row}>
-            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">{item.name}</Text>
+          <Pressable
+            accessibilityLabel={item.name}
+            accessibilityRole="button"
+            onPress={() => navigation.navigate('ProductForm', { productId: item.id })}
+            style={styles.row}
+          >
+            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+              {item.name}
+            </Text>
             <View style={styles.prices}>
               <Text style={styles.price}>{formatCurrency(item.priceCents)}</Text>
               {item.costCents != null ? (
@@ -49,18 +74,24 @@ export function ProductListScreen() {
                 <Text style={styles.cost}>Costo: —</Text>
               )}
             </View>
-          </View>
+          </Pressable>
         )}
         ListEmptyComponent={
           query.trim() === ''
             ? <EmptyState variant="PRODUCTS" />
-            : <Text style={styles.noResults}>Sin resultados para "{query}"</Text>
+            : (
+              <Text style={styles.noResults}>
+                Sin resultados para {"\""}
+                {query}
+                {"\""}
+              </Text>
+            )
         }
         contentContainerStyle={filtered.length === 0 ? styles.emptyContainer : undefined}
       />
       <FAB
         accessibilityLabel="Agregar producto"
-        onPress={() => {/* TODO Story 3.2 */}}
+        onPress={() => navigation.navigate('ProductForm', {})}
         prominent={isEmpty}
       />
     </View>
@@ -77,7 +108,9 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.border,
     borderBottomWidth: 1,
     flexDirection: 'row',
+    minHeight: Spacing.touchPreferred,
     justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: Spacing.md,
     paddingVertical: Spacing.sm,
   },
