@@ -9,6 +9,9 @@ import * as schema from '../../db/schema';
 import { ProductRepository } from '../ProductRepository';
 
 const BRANCH_ID = 'branch-1';
+const SHIFT_ID = 'shift-1';
+const NOTE_ID = 'note-1';
+const PROD_ID = 'prod-deactivate';
 const NOW = '2026-01-01T00:00:00.000Z';
 
 function insertBranch(testDb: ReturnType<typeof createTestDb>['db']) {
@@ -18,10 +21,48 @@ function insertBranch(testDb: ReturnType<typeof createTestDb>['db']) {
     .run();
 }
 
+function insertShift(testDb: ReturnType<typeof createTestDb>['db']) {
+  testDb.insert(schema.shifts).values({
+    id: SHIFT_ID,
+    branch_id: BRANCH_ID,
+    operator_name: 'Test',
+    status: 'open',
+    opened_at: NOW,
+  }).run();
+}
+
+function insertNote(
+  testDb: ReturnType<typeof createTestDb>['db'],
+  status: 'open' | 'closed' | 'cancelled' = 'open',
+) {
+  testDb.insert(schema.notes).values({
+    id: NOTE_ID,
+    shift_id: SHIFT_ID,
+    customer_alias: 'Cliente',
+    status,
+    created_at: NOW,
+  }).run();
+}
+
+function insertNoteItem(testDb: ReturnType<typeof createTestDb>['db']) {
+  testDb.insert(schema.note_items).values({
+    id: 'item-1',
+    note_id: NOTE_ID,
+    product_id: PROD_ID,
+    product_name_snapshot: 'Producto Test',
+    unit_price_cents: 5000,
+    quantity: 1,
+  }).run();
+}
+
 describe('ProductRepository', () => {
   const { db: testDb, close } = createTestDb();
 
   beforeEach(() => {
+    testDb.delete(schema.note_items).run();
+    testDb.delete(schema.notes).run();
+    testDb.delete(schema.cash_movements).run();
+    testDb.delete(schema.shifts).run();
     testDb.delete(schema.branch_sort).run();
     testDb.delete(schema.products).run();
     testDb.delete(schema.branches).run();
@@ -216,5 +257,101 @@ describe('ProductRepository', () => {
     const product = await repo.findById('prod-null-cost');
 
     expect(product?.costCents).toBeNull();
+  });
+
+  it('deactivate() desactiva un producto activo, incrementa versión y lo oculta en findAllActive()', async () => {
+    testDb.insert(schema.products).values({
+      id: PROD_ID,
+      name: 'Producto a desactivar',
+      price_cents: 5000,
+      cost_cents: 2000,
+      active: 1,
+      version: 3,
+      created_at: NOW,
+    }).run();
+
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.deactivate(PROD_ID);
+
+    await expect(repo.findAllActive(null)).resolves.toEqual([]);
+    await expect(repo.findById(PROD_ID)).resolves.toEqual({
+      id: PROD_ID,
+      name: 'Producto a desactivar',
+      priceCents: 5000,
+      costCents: 2000,
+      active: false,
+      version: 4,
+      createdAt: NOW,
+    });
+  });
+
+  it('deactivate() no lanza cuando el producto no existe', async () => {
+    const repo = new ProductRepository(testDb as never);
+
+    await expect(repo.deactivate('missing-id')).resolves.toBeUndefined();
+  });
+
+  it('hasOpenNoteItems() retorna false cuando no hay notas abiertas', async () => {
+    testDb.insert(schema.products).values({
+      id: PROD_ID,
+      name: 'Producto Test',
+      price_cents: 5000,
+      cost_cents: null,
+      active: 1,
+      version: 1,
+      created_at: NOW,
+    }).run();
+
+    const repo = new ProductRepository(testDb as never);
+
+    await expect(repo.hasOpenNoteItems(PROD_ID)).resolves.toBe(false);
+  });
+
+  it('hasOpenNoteItems() retorna true cuando existe una nota open con el producto', async () => {
+    insertBranch(testDb);
+    testDb.insert(schema.products).values({
+      id: PROD_ID,
+      name: 'Producto Test',
+      price_cents: 5000,
+      cost_cents: null,
+      active: 1,
+      version: 1,
+      created_at: NOW,
+    }).run();
+    insertShift(testDb);
+    insertNote(testDb, 'open');
+    insertNoteItem(testDb);
+
+    const repo = new ProductRepository(testDb as never);
+
+    await expect(repo.hasOpenNoteItems(PROD_ID)).resolves.toBe(true);
+  });
+
+  it('hasOpenNoteItems() retorna false para notas closed o cancelled', async () => {
+    insertBranch(testDb);
+    testDb.insert(schema.products).values({
+      id: PROD_ID,
+      name: 'Producto Test',
+      price_cents: 5000,
+      cost_cents: null,
+      active: 1,
+      version: 1,
+      created_at: NOW,
+    }).run();
+    insertShift(testDb);
+    insertNote(testDb, 'closed');
+    insertNoteItem(testDb);
+
+    const repo = new ProductRepository(testDb as never);
+
+    await expect(repo.hasOpenNoteItems(PROD_ID)).resolves.toBe(false);
+
+    testDb.delete(schema.note_items).run();
+    testDb.delete(schema.notes).run();
+    insertNote(testDb, 'cancelled');
+    insertNoteItem(testDb);
+
+    await expect(repo.hasOpenNoteItems(PROD_ID)).resolves.toBe(false);
   });
 });

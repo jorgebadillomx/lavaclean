@@ -24,6 +24,8 @@ function makeRepo() {
     findAllActive: jest.fn().mockResolvedValue([]),
     findById: jest.fn().mockResolvedValue(existingProduct),
     save: jest.fn().mockResolvedValue(undefined),
+    deactivate: jest.fn().mockResolvedValue(undefined),
+    hasOpenNoteItems: jest.fn().mockResolvedValue(false),
   } satisfies IProductRepository;
 }
 

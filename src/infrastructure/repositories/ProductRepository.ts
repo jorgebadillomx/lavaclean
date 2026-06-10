@@ -83,4 +83,32 @@ export class ProductRepository implements IProductRepository {
       })
       .run();
   }
+
+  async deactivate(id: string): Promise<void> {
+    this.dbInstance
+      .update(schema.products)
+      .set({
+        active: 0,
+        version: sql`${schema.products.version} + 1`,
+      })
+      .where(eq(schema.products.id, id))
+      .run();
+  }
+
+  async hasOpenNoteItems(productId: string): Promise<boolean> {
+    const rows = this.dbInstance
+      .select({ id: schema.note_items.id })
+      .from(schema.note_items)
+      .innerJoin(schema.notes, eq(schema.note_items.note_id, schema.notes.id))
+      .where(
+        and(
+          eq(schema.note_items.product_id, productId),
+          eq(schema.notes.status, 'open'),
+        ),
+      )
+      .limit(1)
+      .all();
+
+    return rows.length > 0;
+  }
 }
