@@ -118,6 +118,23 @@
 - `BranchRepository.save()` incluye `created_at` en `onConflictDoUpdate` — sobreescribe timestamp de creación en upsert; en práctica Supabase devuelve el mismo valor. [src/infrastructure/repositories/BranchRepository.ts:44]
 - `BranchSelectScreen` importa infraestructura directamente (`BranchRepository`, `db`, `schema`) — concern arquitectural de capas; DI vía props preserva testabilidad. Refactor en épica posterior si se introduce inyección de dependencias formal. [src/presentation/features/auth/screens/BranchSelectScreen.tsx:5]
 
+## Deferred from: code review of 3-2-crear-y-editar-productos (2026-06-08)
+
+- `async save()` en `ProductRepository` usa `.run()` síncrono sin `await` — mismo patrón que `BranchRepository` y resto del codebase; Drizzle sync API para SQLite. No introducido en esta historia. [src/infrastructure/repositories/ProductRepository.ts:63]
+- Sin indicador de carga durante re-fetch en `useFocusEffect` de `ProductListScreen` — patrón pre-existente; la lista muestra datos stale brevemente al volver del formulario. [src/presentation/features/products/screens/ProductListScreen.tsx:19]
+- Race condition teórico de doble-tap en `handleSave` — el guard `saving` no es atómico; en práctica React batching y UX lo mitigan. [src/presentation/features/products/screens/ProductFormScreen.tsx:70]
+- `active: true` hardcodeado en `SaveProductUseCase` — por diseño; la desactivación de productos es scope exclusivo de Story 3.3; `onConflictDoUpdate` correctamente omite `active`. [src/application/products/SaveProductUseCase.ts:50]
+
+## Deferred from: code review of 3-3-desactivar-productos-solo-administrador (2026-06-09)
+
+- TOCTOU en `hasOpenNoteItems` — resultado puede estar stale cuando el usuario confirma el diálogo; inherente al check-then-act en app mobile local-first. [ProductFormScreen.tsx:76-87]
+- Version skew teórico entre incremento atómico en DB (`SET version = version + 1`) y `product.version + 1` en payload outbox — spec-prescribed pattern, irrelevante en app mobile single-user sin escrituras concurrentes. [DeactivateProductUseCase.ts:26-31]
+- Outbox try/catch silencia errores de insert — si el insert falla, el producto queda desactivado en SQLite sin evento de sync encolado; spec-prescribed, mismo patrón que SaveProductUseCase. [DeactivateProductUseCase.ts:48-51]
+- `new ProductRepository()` y `new DeactivateProductUseCase()` instanciados directamente en la pantalla — patrón pre-existente en todo el codebase; DI formal en épica posterior. [ProductFormScreen.tsx:76,88]
+- `product.active` en JSX puede estar stale si sync externo desactiva el producto mientras la pantalla está abierta — limitación inherente al modelo local-first; segundo intento es manejado por error `product_already_inactive`. [ProductFormScreen.tsx:180]
+- `deactivate()` silently no-ops en ID inexistente — el use case valida existencia antes de llamarlo; sin riesgo real en app single-user sin deletes concurrentes. [ProductRepository.ts:87]
+- `.run()` síncrono con wrapper `async` en `deactivate()` — mismo patrón pre-existente de `save()` y `BranchRepository`, Drizzle sync API para SQLite. [ProductRepository.ts:87]
+
 ## Deferred from: code review of 3-1-listar-y-buscar-productos-del-catalogo (2026-06-05)
 
 - `activeBranch` type safety — undefined/empty string del store se trata como null sin advertencia; el ternario `branchId ? ... : sql\`0 = 1\`` silencia silenciosamente ambos casos. [src/presentation/features/products/screens/ProductListScreen.tsx:14]

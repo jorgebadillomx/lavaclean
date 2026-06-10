@@ -3,9 +3,7 @@ module.exports = {
     name: 'LavaClean',
     slug: 'lavaclean',
     version: '1.0.0',
-    runtimeVersion: {
-      policy: 'fingerprint',
-    },
+    runtimeVersion: '1.0.0',
     orientation: 'portrait',
     userInterfaceStyle: 'light',
     icon: './assets/images/icon.png',
@@ -23,7 +21,6 @@ module.exports = {
       eas: {
         projectId: '80847ecf-5324-4947-95f0-da696f1fa8df',
       },
-      adminSalt: process.env.ADMIN_SALT,
     },
     plugins: [
       ['expo-build-properties', { android: { allowBackup: false, minSdkVersion: 24 } }],

@@ -1,18 +1,10 @@
-import { Linking, Platform } from 'react-native';
+import * as IntentLauncher from 'expo-intent-launcher';
+import { Platform } from 'react-native';
 
-export const RAWBT_ACTION = 'rawbt.api.ACTION_PRINT_TEXT';
-export const RAWBT_EXTRA_KEY = 'rawbt.api.EXTRA_PRINT_TEXT';
+export const RAWBT_PACKAGE = 'ru.a402d.rawbtprinter';
 export const RAWBT_SPIKE_TEST_TEXT = '--- SPIKE LAVACLEAN ---\nTest de impresión\n\n\n';
 
 export type RawBTTestIntentResult = 'success' | 'not_installed' | 'error';
-
-function isRawBTNotInstalledError(errorMessage: string): boolean {
-  return (
-    errorMessage.includes('ActivityNotFoundException') ||
-    errorMessage.includes('No Activity found') ||
-    errorMessage.includes('Could not launch Intent')
-  );
-}
 
 export async function fireRawBTTestIntent(testText: string): Promise<RawBTTestIntentResult> {
   if (Platform.OS !== 'android') {
@@ -20,15 +12,23 @@ export async function fireRawBTTestIntent(testText: string): Promise<RawBTTestIn
   }
 
   try {
-    await Linking.sendIntent(RAWBT_ACTION, [
-      { key: RAWBT_EXTRA_KEY, value: testText },
-    ]);
+    await IntentLauncher.startActivityAsync('android.intent.action.SEND', {
+      type: 'text/plain',
+      packageName: RAWBT_PACKAGE,
+      className: `${RAWBT_PACKAGE}.activity.PrintExtraActivity`,
+      extra: { 'android.intent.extra.TEXT': testText },
+    });
     return 'success';
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error('[RawBT Spike] Intent failed:', message);
 
-    if (isRawBTNotInstalledError(message)) {
+    if (
+      message.includes('ActivityNotFoundException') ||
+      message.includes('No Activity found') ||
+      message.includes('Could not launch Intent') ||
+      message.includes('not found')
+    ) {
       return 'not_installed';
     }
 

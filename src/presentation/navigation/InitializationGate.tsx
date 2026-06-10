@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from 'react-native';
+import * as SplashScreen from 'expo-splash-screen';
 import { rawDb } from '../../infrastructure/db/client';
 import { hydrateIfNeeded } from '../../infrastructure/sync/InitialHydration';
 import { supabase } from '../../infrastructure/sync/SupabaseClient';
@@ -18,11 +19,18 @@ export function InitializationGate({ children }: Props) {
   useEffect(() => {
     if (initStatus === 'UNINITIALIZED') {
       (async () => {
-        await hydrateIfNeeded(rawDb, supabase).catch(() => {
-          // Silencioso: la UI degradada ya se encarga del caso sin datos.
-        });
+        await Promise.race([
+          hydrateIfNeeded(rawDb, supabase),
+          new Promise<void>((resolve) => setTimeout(resolve, 10000)),
+        ]).catch(() => {});
         hydrateStore();
       })();
+    }
+  }, [initStatus]);
+
+  useEffect(() => {
+    if (initStatus === 'READY' || initStatus === 'ERROR') {
+      SplashScreen.hideAsync().catch(() => {});
     }
   }, [initStatus]);
 

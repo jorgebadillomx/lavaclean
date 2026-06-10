@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-02
-last_updated: 2026-06-05  # 1-8 → done; 1-9 → in-progress; epic-1-retrospective → done; epic-2 → in-progress; 2-1 → done; 2-2 → done; 2-3 → done (code review: 4 patches aplicados); 2-4 → done (code review: 4 patches aplicados); epic-3 → in-progress; 3-1 → done (code review: 5 patches aplicados); epic-2-retrospective → done
+last_updated: 2026-06-09  # 1-9 → done, epic-1 → done, 3-3 → done
 project: lavaclean
 
 
@@ -45,7 +45,7 @@ story_location: _bmad-output/implementation-artifacts
 
 development_status:
   # ─── Epic 1: Fundación Técnica (Sprint 0) ───────────────────────────────────
-  epic-1: in-progress
+  epic-1: done
   1-1-scaffold-del-proyecto-y-pipeline-ci-cd: done
   1-2-schema-sqlite-y-capa-de-base-de-datos-local: done
   1-3-initializationgate-y-zustand-store: done
@@ -54,7 +54,7 @@ development_status:
   1-6-configuracion-de-supabase-rls: done
   1-7-sistema-de-diseno-tokens-y-componentes-atomicos: done
   1-8-eas-build-sentry-y-apk-observable-en-dispositivo-fisico: done
-  1-9-spike-de-impresion-rawbt-y-monitoreo-de-storage-supabase: in-progress
+  1-9-spike-de-impresion-rawbt-y-monitoreo-de-storage-supabase: done
   epic-1-retrospective: done
 
   # ─── Epic 2: Inicio de Sesión y Selección de Sucursal ───────────────────────
@@ -68,8 +68,8 @@ development_status:
   # ─── Epic 3: Catálogo de Productos ──────────────────────────────────────────
   epic-3: in-progress
   3-1-listar-y-buscar-productos-del-catalogo: done
-  3-2-crear-y-editar-productos: backlog
-  3-3-desactivar-productos-solo-administrador: backlog
+  3-2-crear-y-editar-productos: done
+  3-3-desactivar-productos-solo-administrador: done
   3-4-reordenamiento-manual-del-catalogo-por-sucursal: backlog
   epic-3-retrospective: optional
 
