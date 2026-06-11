@@ -111,4 +111,24 @@ export class ProductRepository implements IProductRepository {
 
     return rows.length > 0;
   }
+
+  async saveBranchSort(
+    branchId: string,
+    entries: { productId: string; sortOrder: number }[],
+  ): Promise<void> {
+    for (const entry of entries) {
+      this.dbInstance
+        .insert(schema.branch_sort)
+        .values({
+          branch_id: branchId,
+          product_id: entry.productId,
+          sort_order: entry.sortOrder,
+        })
+        .onConflictDoUpdate({
+          target: [schema.branch_sort.branch_id, schema.branch_sort.product_id],
+          set: { sort_order: entry.sortOrder },
+        })
+        .run();
+    }
+  }
 }

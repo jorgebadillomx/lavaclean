@@ -6,4 +6,5 @@ export interface IProductRepository {
   save(product: Product): Promise<void>;
   deactivate(id: string): Promise<void>;
   hasOpenNoteItems(productId: string): Promise<boolean>;
+  saveBranchSort(branchId: string, entries: { productId: string; sortOrder: number }[]): Promise<void>;
 }
