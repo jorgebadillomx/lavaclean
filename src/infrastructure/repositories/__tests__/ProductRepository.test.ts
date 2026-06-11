@@ -354,4 +354,67 @@ describe('ProductRepository', () => {
 
     await expect(repo.hasOpenNoteItems(PROD_ID)).resolves.toBe(false);
   });
+
+  it('saveBranchSort() inserta entradas nuevas y findAllActive() respeta el nuevo orden', async () => {
+    insertBranch(testDb);
+    testDb.insert(schema.products).values([
+      { id: 'prod-a', name: 'Lavado Normal', price_cents: 8000, active: 1, version: 1, created_at: '2026-01-01T00:00:00.000Z' },
+      { id: 'prod-b', name: 'Lavado Completo', price_cents: 12000, active: 1, version: 1, created_at: '2026-01-02T00:00:00.000Z' },
+    ]).run();
+
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.saveBranchSort(BRANCH_ID, [
+      { productId: 'prod-a', sortOrder: 2 },
+      { productId: 'prod-b', sortOrder: 1 },
+    ]);
+
+    const result = await repo.findAllActive(BRANCH_ID);
+
+    expect(result.map((p) => p.id)).toEqual(['prod-b', 'prod-a']);
+  });
+
+  it('saveBranchSort() actualiza sort_order existente con upsert', async () => {
+    insertBranch(testDb);
+    testDb.insert(schema.products).values([
+      { id: 'prod-a', name: 'Lavado Normal', price_cents: 8000, active: 1, version: 1, created_at: '2026-01-01T00:00:00.000Z' },
+      { id: 'prod-b', name: 'Lavado Completo', price_cents: 12000, active: 1, version: 1, created_at: '2026-01-02T00:00:00.000Z' },
+    ]).run();
+    testDb.insert(schema.branch_sort).values([
+      { branch_id: BRANCH_ID, product_id: 'prod-a', sort_order: 1 },
+      { branch_id: BRANCH_ID, product_id: 'prod-b', sort_order: 2 },
+    ]).run();
+
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.saveBranchSort(BRANCH_ID, [
+      { productId: 'prod-a', sortOrder: 2 },
+      { productId: 'prod-b', sortOrder: 1 },
+    ]);
+
+    const result = await repo.findAllActive(BRANCH_ID);
+
+    expect(result.map((p) => p.id)).toEqual(['prod-b', 'prod-a']);
+  });
+
+  it('saveBranchSort() persiste batches de múltiples productos en una sola llamada lógica', async () => {
+    insertBranch(testDb);
+    testDb.insert(schema.products).values([
+      { id: 'prod-a', name: 'Lavado Normal', price_cents: 8000, active: 1, version: 1, created_at: '2026-01-01T00:00:00.000Z' },
+      { id: 'prod-b', name: 'Lavado Completo', price_cents: 12000, active: 1, version: 1, created_at: '2026-01-02T00:00:00.000Z' },
+      { id: 'prod-c', name: 'Encerado', price_cents: 15000, active: 1, version: 1, created_at: '2026-01-03T00:00:00.000Z' },
+    ]).run();
+
+    const repo = new ProductRepository(testDb as never);
+
+    await repo.saveBranchSort(BRANCH_ID, [
+      { productId: 'prod-c', sortOrder: 1 },
+      { productId: 'prod-a', sortOrder: 2 },
+      { productId: 'prod-b', sortOrder: 3 },
+    ]);
+
+    const result = await repo.findAllActive(BRANCH_ID);
+
+    expect(result.map((p) => p.id)).toEqual(['prod-c', 'prod-a', 'prod-b']);
+  });
 });

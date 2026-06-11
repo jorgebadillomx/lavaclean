@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-06-02
-last_updated: 2026-06-09  # 1-9 → done, epic-1 → done, 3-3 → done
+last_updated: 2026-06-10  # 3-4 → done
 project: lavaclean
 
 
@@ -70,7 +70,7 @@ development_status:
   3-1-listar-y-buscar-productos-del-catalogo: done
   3-2-crear-y-editar-productos: done
   3-3-desactivar-productos-solo-administrador: done
-  3-4-reordenamiento-manual-del-catalogo-por-sucursal: backlog
+  3-4-reordenamiento-manual-del-catalogo-por-sucursal: done
   epic-3-retrospective: optional
 
   # ─── Epic 4a: Turno y Caja ──────────────────────────────────────────────────

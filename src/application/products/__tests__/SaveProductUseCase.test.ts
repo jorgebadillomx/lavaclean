@@ -26,6 +26,7 @@ function makeRepo() {
     save: jest.fn().mockResolvedValue(undefined),
     deactivate: jest.fn().mockResolvedValue(undefined),
     hasOpenNoteItems: jest.fn().mockResolvedValue(false),
+    saveBranchSort: jest.fn().mockResolvedValue(undefined),
   } satisfies IProductRepository;
 }
 

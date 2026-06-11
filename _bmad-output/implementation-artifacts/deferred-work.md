@@ -144,3 +144,12 @@
 - Intl en Hermes — primera aparición de `Intl.NumberFormat` y `Intl.DateTimeFormat` en el proyecto; builds con Hermes antiguo o sin ICU completo pueden lanzar `RangeError`; verificar soporte o agregar polyfill. [src/presentation/utils/format.ts:1-14]
 - Sort tie-breaking no determinístico — dos productos con el mismo `sort_order` y el mismo `created_at` tienen orden indefinido entre sí; SQLite no garantiza estabilidad más allá de las columnas del ORDER BY. [src/infrastructure/repositories/ProductRepository.ts:44-47]
 - priceCents negativo — la entidad `Product` no valida `priceCents >= 0`; un valor negativo (dato corrupto de sync) se renderiza como precio negativo sin ninguna advertencia. [src/domain/entities/Product.ts:4]
+
+## Deferred from: code review of 3-4-reordenamiento-manual-del-catalogo-por-sucursal (2026-06-10)
+
+- `saveBranchSort` sin transacción — upserts secuenciales independientes; un crash a mitad del loop deja `branch_sort` en estado parcial sin posibilidad de rollback. [src/infrastructure/repositories/ProductRepository.ts:119-132]
+- `handleMove` cierre estancado — `useCallback` captura `products` en el momento del render; si `useFocusEffect` dispara un re-fetch mientras hay un reorder en vuelo, `setProducts(newOrder)` sobreescribe los datos frescos con el orden stale. [src/presentation/features/products/screens/ProductListScreen.tsx:54-76]
+- Colisión de `idempotency_key` en outbox al regresar al mismo orden — si un producto vuelve a la misma posición y la entrada anterior aún está pendiente, el UNIQUE constraint lanza y se traga silenciosamente; el evento de sync queda sin re-encolar. [src/application/products/ReorderProductsUseCase.ts:63]
+- Lista de un solo producto: botones con `opacity:0` permanecen en el árbol de accesibilidad — TalkBack/VoiceOver anuncia dos botones que están disabled e invisibles, sin `accessibilityElementsHidden`. [src/presentation/features/products/components/ProductReorderRow.tsx:46-63]
+- Sin tests de pantalla para `ProductListScreen` — el flujo `handleMove → setProducts` y el renderizado condicional según búsqueda activa no tienen cobertura automatizada.
+- Mock `makeDb()` en `ReorderProductsUseCase.test.ts` no encadena `.onConflictDoUpdate()` — fragilidad latente si un test futuro intenta ejercitar el repositorio real a través de ese helper. `src/application/products/__tests__/ReorderProductsUseCase.test.ts:39-44`
